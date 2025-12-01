@@ -45,7 +45,7 @@ export interface Birthday {
   id: string;
   name: string;
   date: string;
-  notes?: string;
+  notes: string | null;
 }
 
 interface BirthdayCalendarProps {
@@ -115,7 +115,7 @@ export default function BirthdayCalendar({
       onAddBirthday({
         name: formData.name,
         date: formData.date,
-        notes: formData.notes || undefined,
+        notes: formData.notes || null,
       });
       setIsAddDialogOpen(false);
       setFormData({ name: "", date: "", notes: "" });
@@ -128,7 +128,7 @@ export default function BirthdayCalendar({
         ...editingBirthday,
         name: formData.name,
         date: formData.date,
-        notes: formData.notes || undefined,
+        notes: formData.notes || null,
       });
       setIsEditDialogOpen(false);
       setEditingBirthday(null);

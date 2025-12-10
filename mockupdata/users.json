@@ -1,0 +1,29 @@
+[
+  {
+    "id": "1",
+    "username": "admin",
+    "password": "admin",
+    "name": "Cozi Dental Admin",
+    "email": "admin@smithai.com",
+    "role": "admin",
+    "createdAt": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "2",
+    "username": "admin1",
+    "password": "admin",
+    "name": "Admin User 1",
+    "email": "admin1@smithai.com",
+    "role": "admin",
+    "createdAt": "2024-01-02T00:00:00Z"
+  },
+  {
+    "id": "3",
+    "username": "admin2",
+    "password": "admin",
+    "name": "Admin User 2",
+    "email": "admin2@smithai.com",
+    "role": "admin",
+    "createdAt": "2024-01-03T00:00:00Z"
+  }
+]

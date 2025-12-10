@@ -1,0 +1,67 @@
+[
+  {
+    "id": "1",
+    "name": "Eleanor Vance",
+    "email": "eleanor.vance@example.com",
+    "avatarUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuAAb6QXvuHqZ6gTrIb2wPMKoAEUrGBC-xSQAwod8X2V4w1JTw1bytfPSg9IrQlRDfPaWpLAVXIJa_CDPqQ-S05XD0onw1kMXwPlCUedS4gpEsxX__Z2nm-29VwItKSITfHzw4g3G52aBXZcqRipj38WH0pV2LLpDudgarunJdwENDiB_Kq7_quv2JKHvXxP_M9p1TeL_0FYcKiitLGAIaVVUNPJUYNyJbLn02cNJsZykjRMF97iVS7qVBax6PrDbt109wLzlTGZCVw",
+    "status": "Active",
+    "memberType": "Premium Member",
+    "details": {
+      "memberId": "MBR-84392",
+      "joinDate": "January 15, 2022",
+      "membershipLevel": "Premium",
+      "renewalDate": "January 15, 2025",
+      "email": "eleanor.vance@example.com",
+      "phone": "(555) 123-4567",
+      "address": "123 Innovation Drive, Suite 404, Tech City, ST 54321"
+    }
+  },
+  {
+    "id": "2",
+    "name": "Marcus Holloway",
+    "email": "marcus.h@example.com",
+    "avatarUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuBwm3LJujRNbVnLz0FKbQLaYvZ8nICyksURlrpLspasFOrNSwrWz2KTLIq1lzGC37LnmH7uxkFXmMSCawMbr6IIzCpQyNbbNy_bJmIeFHfY5nxIwHIQaSoucg9k0L8yAq2Twf38Pyd8sgD_z3RX4FN-dgMbonQL-PTQJw-vsdLn0j08NiGYrl6KtGm16Im0ZjYa19e-jt5y4S2DgKMd99efrl9FCvZgDV513FoRDBxz--EC0VT_seio5_7bZy9i-I2J1ZKiBMalFwo",
+    "status": "Active",
+    "details": {
+      "memberId": "MBR-84393",
+      "joinDate": "March 22, 2021",
+      "membershipLevel": "Standard",
+      "renewalDate": "March 22, 2025",
+      "email": "marcus.h@example.com",
+      "phone": "(555) 234-5678",
+      "address": "456 Tech Boulevard, Apt 202, Silicon Valley, CA 94025"
+    }
+  },
+  {
+    "id": "3",
+    "name": "Clara Oswald",
+    "email": "clara.o@example.com",
+    "avatarUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuDZk6ZcnWh4IIKxjt_4aueawNvhL41pJDCOSS2MC19tLhS0ougPM-RaOrBmhkbMJW09fM5f2D62b9ra1do2Or3vJh0gAZ5ozjU7L6WjtetnL3AneEFDaIOpJyrKGK2e1MilaaH91kfa-X75ZD9-RupnMeeXOZl0FATtg5txtTEibU7NAW4-SZrRxDmdZ66R_awFKrUGxvPOPoMzRGFa1ijacALxxkM38FyiiQqWg3AMKk_2DSlDSqcTwf3SePUcn5pofqOkaftm6ZY",
+    "status": "Pending",
+    "details": {
+      "memberId": "MBR-84394",
+      "joinDate": "October 5, 2023",
+      "membershipLevel": "Basic",
+      "renewalDate": "October 5, 2024",
+      "email": "clara.o@example.com",
+      "phone": "(555) 345-6789",
+      "address": "789 Startup Lane, Building C, Austin, TX 78701"
+    }
+  },
+  {
+    "id": "4",
+    "name": "Arthur Pendragon",
+    "email": "arthur.p@example.com",
+    "avatarUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuCW5PPDkM754glRdKR30WNk1bfRsisGHhn4iQlLkTLEwlNMdW7XY7bEsLgeXb5TGKF9bzlzBoJxdTJN7YxHizjoprWKWPoUNBx2DLX6zwwxOu0GZhPmzKjow55kqLg8EZ3JVnyH4NGmb-l53Q-LuGHk0pWtFYsRJvG-SW9_d_ua3bi8IVAFNxAjyYjKyjTZsFUHJ7bZ6dqqleGGjyHpTM46APavlM9A0glOwEHMmtZtnalKFzykfPy6SEabXmQV3NeAw_WUNety2EM",
+    "status": "Inactive",
+    "details": {
+      "memberId": "MBR-84395",
+      "joinDate": "June 12, 2020",
+      "membershipLevel": "Premium",
+      "renewalDate": "June 12, 2023",
+      "email": "arthur.p@example.com",
+      "phone": "(555) 456-7890",
+      "address": "321 Enterprise Street, Floor 5, New York, NY 10001"
+    }
+  }
+]

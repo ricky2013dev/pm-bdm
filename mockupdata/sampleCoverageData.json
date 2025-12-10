@@ -1,0 +1,163 @@
+{
+  "id": "6364793487228928",
+  "controlNumber": "CTRL-2024-001234",
+  "status": "Completed",
+  "statusCode": "20",
+  "createdDate": "2024-11-13T10:30:00Z",
+  "updatedDate": "2024-11-13T10:35:00Z",
+  "expirationDate": "2024-12-13T10:35:00Z",
+  "payer": {
+    "payerId": "614426698842112",
+    "name": "Sample Insurance Company",
+    "responseDescription": "Coverage found and verified",
+    "responseCode": "Y"
+  },
+  "requestingProvider": {
+    "npi": "1234567890",
+    "firstName": "John",
+    "lastName": "Dentist",
+    "specialty": "General Dentistry",
+    "address": {
+      "line1": "123 Dental Street",
+      "line2": "Suite 200",
+      "city": "Springfield",
+      "state": "IL",
+      "zipCode": "62701"
+    },
+    "phone": "(555) 123-4567"
+  },
+  "patient": {
+    "memberId": "MEM123456789",
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "middleName": "Marie",
+    "birthDate": "1985-03-15",
+    "gender": "F",
+    "ssn": "***-**-4567",
+    "address": {
+      "line1": "456 Patient Lane",
+      "city": "Springfield",
+      "state": "IL",
+      "zipCode": "62702"
+    },
+    "phone": "(555) 987-6543"
+  },
+  "subscriber": {
+    "memberId": "MEM123456789",
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "birthDate": "1985-03-15",
+    "gender": "F",
+    "relationshipToPatient": "Self"
+  },
+  "plans": [
+    {
+      "planName": "Comprehensive Dental Plan",
+      "groupNumber": "GRP-98765",
+      "effectiveDate": "2024-01-01",
+      "terminationDate": "2024-12-31",
+      "status": "Active",
+      "coverageLevel": "Family",
+      "benefits": {
+        "deductible": {
+          "individual": {
+            "amount": 50.00,
+            "remaining": 25.00,
+            "period": "Calendar Year"
+          },
+          "family": {
+            "amount": 150.00,
+            "remaining": 100.00,
+            "period": "Calendar Year"
+          }
+        },
+        "maximumBenefit": {
+          "amount": 2000.00,
+          "remaining": 1500.00,
+          "period": "Calendar Year"
+        },
+        "preventiveCare": {
+          "coverage": 100,
+          "description": "Preventive services covered at 100%",
+          "services": [
+            "Routine cleanings (2 per year)",
+            "Examinations (2 per year)",
+            "X-rays (1 set per year)",
+            "Fluoride treatments (ages 0-18)"
+          ]
+        },
+        "basicServices": {
+          "coverage": 80,
+          "description": "Basic services covered at 80% after deductible",
+          "services": [
+            "Fillings",
+            "Simple extractions",
+            "Emergency care"
+          ]
+        },
+        "majorServices": {
+          "coverage": 50,
+          "description": "Major services covered at 50% after deductible",
+          "services": [
+            "Crowns",
+            "Bridges",
+            "Dentures",
+            "Root canals"
+          ],
+          "waitingPeriod": "12 months"
+        },
+        "orthodontics": {
+          "coverage": 50,
+          "lifetimeMaximum": 1500.00,
+          "lifetimeRemaining": 1500.00,
+          "ageLimit": 19,
+          "description": "Orthodontic services covered at 50%, age limit 19"
+        }
+      },
+      "limitations": [
+        {
+          "service": "Prophylaxis (Cleaning)",
+          "code": "D1110",
+          "frequency": "2 per calendar year",
+          "lastService": "2024-05-15"
+        },
+        {
+          "service": "Bitewing X-rays",
+          "code": "D0274",
+          "frequency": "2 per calendar year",
+          "lastService": "2024-05-15"
+        },
+        {
+          "service": "Full Mouth X-rays",
+          "code": "D0210",
+          "frequency": "1 per 3 years",
+          "lastService": "2023-01-10"
+        }
+      ],
+      "exclusions": [
+        "Cosmetic dentistry",
+        "Teeth whitening",
+        "Dental implants (unless medically necessary)"
+      ]
+    }
+  ],
+  "validationMessages": [],
+  "additionalInformation": {
+    "coordinationOfBenefits": "This is the primary plan",
+    "priorAuthorizationRequired": [
+      "Crowns over $500",
+      "Bridges",
+      "Dentures",
+      "Orthodontic treatment"
+    ],
+    "claimsAddress": {
+      "line1": "Sample Insurance Claims Dept",
+      "line2": "PO Box 12345",
+      "city": "Des Moines",
+      "state": "IA",
+      "zipCode": "50301"
+    },
+    "customerServicePhone": "1-800-555-DENT",
+    "memberServiceWebsite": "https://www.sampleinsurance.com"
+  }
+}

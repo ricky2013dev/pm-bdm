@@ -1,8 +1,10 @@
 import { Router, Route, Switch } from 'wouter';
 import HomePage from '@/components/HomePage';
 import PatientsManagement from '@/components/b2b-agent/PatientsManagement';
+import PatientDetailPage from '@/components/b2b-agent/PatientDetailPage';
 import SmartAITransactionHistory from '@/components/b2b-agent/SmartAITransactionHistory';
 import DailyJobDashboard from '@/components/b2b-agent/DailyJobDashboard';
+import InsuranceCallDashboard from '@/components/insurance/InsuranceCallDashboard';
 
 function App() {
   return (
@@ -10,8 +12,10 @@ function App() {
       <Switch>
         <Route path="/" component={() => <HomePage />} />
         <Route path="/b2b-agent/dashboard" component={() => <DailyJobDashboard />} />
+        <Route path="/b2b-agent/patient-detail" component={() => <PatientDetailPage />} />
         <Route path="/b2b-agent/patient-appointments" component={() => <PatientsManagement />} />
         <Route path="/b2b-agent/smart-ai-transaction-history" component={() => <SmartAITransactionHistory />} />
+        <Route path="/insurance/dashboard" component={() => <InsuranceCallDashboard />} />
         <Route path="/dashboard" component={() => <DailyJobDashboard />} />
         <Route path="/patient-appointments" component={() => <PatientsManagement />} />
         <Route path="/smart-ai-transaction-history" component={() => <SmartAITransactionHistory />} />

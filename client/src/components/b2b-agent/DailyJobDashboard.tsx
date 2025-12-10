@@ -276,7 +276,8 @@ const DailyJobDashboard: React.FC<DailyJobDashboardProps> = ({ patients: patient
     if (onDetailClick) {
       onDetailClick(job.patient.id);
     } else {
-      navigate(`/b2b-agent/patient-appointments?patientId=${job.patient.id}`);
+      // Always navigate to Sarah Jane Johnson (ID: 1001)
+      navigate(`/b2b-agent/patient-detail?patientId=1001`);
     }
   };
 

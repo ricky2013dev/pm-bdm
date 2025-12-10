@@ -1,73 +1,116 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertBirthdaySchema } from "@shared/schema";
+import bcrypt from "bcryptjs";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  
-  app.get("/api/birthdays", async (_req, res) => {
+
+  // Seed test users if they don't exist
+  const seedTestUsers = async () => {
     try {
-      const birthdays = await storage.getAllBirthdays();
-      res.json(birthdays);
+      const dentalUser = await storage.getUserByEmail("dental@smithai.com");
+      if (!dentalUser) {
+        const hashedPassword = await bcrypt.hash("admin123", 10);
+        await storage.createUser({
+          email: "dental@smithai.com",
+          username: "dental_admin",
+          password: hashedPassword,
+          role: "dental"
+        });
+        console.log("Created test dental user: dental@smithai.com");
+      }
+
+      const insuranceUser = await storage.getUserByEmail("insurance@smithai.com");
+      if (!insuranceUser) {
+        const hashedPassword = await bcrypt.hash("admin123", 10);
+        await storage.createUser({
+          email: "insurance@smithai.com",
+          username: "insurance_admin",
+          password: hashedPassword,
+          role: "insurance"
+        });
+        console.log("Created test insurance user: insurance@smithai.com");
+      }
     } catch (error) {
-      console.error("Error fetching birthdays:", error);
-      res.status(500).json({ error: "Failed to fetch birthdays" });
+      console.error("Error seeding test users:", error);
+    }
+  };
+
+  // Seed test users on startup
+  await seedTestUsers();
+
+  // Authentication routes
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(401).json({ error: "Invalid email or password" });
+      }
+
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res.status(401).json({ error: "Invalid email or password" });
+      }
+
+      // Store user in session
+      (req.session as any).userId = user.id;
+      (req.session as any).userRole = user.role;
+      (req.session as any).userEmail = user.email;
+
+      res.json({
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role
+        }
+      });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ error: "Failed to login" });
     }
   });
 
-  app.get("/api/birthdays/:id", async (req, res) => {
-    try {
-      const birthday = await storage.getBirthday(req.params.id);
-      if (!birthday) {
-        return res.status(404).json({ error: "Birthday not found" });
+  app.post("/api/auth/logout", async (req, res) => {
+    req.session?.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ error: "Failed to logout" });
       }
-      res.json(birthday);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch birthday" });
-    }
+      res.clearCookie("connect.sid");
+      res.json({ success: true });
+    });
   });
 
-  app.post("/api/birthdays", async (req, res) => {
+  app.get("/api/auth/verify", async (req, res) => {
     try {
-      const parsed = insertBirthdaySchema.safeParse(req.body);
-      if (!parsed.success) {
-        return res.status(400).json({ error: "Invalid birthday data", details: parsed.error.errors });
+      const userId = (req.session as any)?.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
       }
-      const birthday = await storage.createBirthday(parsed.data);
-      res.status(201).json(birthday);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to create birthday" });
-    }
-  });
 
-  app.put("/api/birthdays/:id", async (req, res) => {
-    try {
-      const parsed = insertBirthdaySchema.partial().safeParse(req.body);
-      if (!parsed.success) {
-        return res.status(400).json({ error: "Invalid birthday data", details: parsed.error.errors });
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(401).json({ error: "User not found" });
       }
-      const birthday = await storage.updateBirthday(req.params.id, parsed.data);
-      if (!birthday) {
-        return res.status(404).json({ error: "Birthday not found" });
-      }
-      res.json(birthday);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to update birthday" });
-    }
-  });
 
-  app.delete("/api/birthdays/:id", async (req, res) => {
-    try {
-      const deleted = await storage.deleteBirthday(req.params.id);
-      if (!deleted) {
-        return res.status(404).json({ error: "Birthday not found" });
-      }
-      res.status(204).send();
+      res.json({
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role
+        }
+      });
     } catch (error) {
-      res.status(500).json({ error: "Failed to delete birthday" });
+      res.status(500).json({ error: "Failed to verify session" });
     }
   });
 

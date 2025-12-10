@@ -12,8 +12,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, userType = 'b2
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [hipaaAgreed, setHipaaAgreed] = useState(false);
+    const [email, setEmail] = useState(userType === 'insurance' ? 'insurance@smithai.com' : 'dental@smithai.com');
+    const [password, setPassword] = useState('');
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
 
         // Check if screen size is mobile (width < 768px) - allow tablets and desktop
@@ -25,16 +27,38 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, userType = 'b2
         setErrorMessage('');
         setIsLoading(true);
 
-        // Simulate authentication delay (800ms)
-        setTimeout(() => {
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email,
+                    password,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setErrorMessage(data.error || 'Login failed. Please try again.');
+                setIsLoading(false);
+                return;
+            }
+
+            // Successfully logged in
             if (userType === 'insurance') {
                 navigate('/insurance/dashboard');
             } else {
                 navigate('/b2b-agent/dashboard');
             }
             onClose();
+        } catch (error) {
+            console.error('Login error:', error);
+            setErrorMessage('An error occurred. Please try again.');
             setIsLoading(false);
-        }, 800);
+        }
     };
 
     if (!isOpen) return null;
@@ -70,7 +94,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, userType = 'b2
                         <input
                             id="email"
                             type="email"
-                            value="smithai.demo.user@gmail.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             required
                             disabled={isLoading}
                             className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
@@ -85,7 +110,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, userType = 'b2
                         <input
                             id="password"
                             type="password"
-                            value="SmithAIDemo@123"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             required
                             disabled={isLoading}
                             className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"

@@ -25,6 +25,8 @@ interface Transaction {
   runBy: string;
   dataVerified: string[];
   verificationScore: number;
+  fetchStatus: 'completed' | 'pending';
+  saveStatus: 'completed' | 'pending';
   responseCode?: string;
   endpoint?: string;
   phoneNumber?: string;
@@ -58,6 +60,8 @@ export const mockData: Transaction[] = [
     runBy: 'Smith AI System',
     dataVerified: ['Member ID', 'Patient Name', 'Plan Name', 'Effective Date', 'Coverage', 'Deductible', 'Annual Maximum'],
     verificationScore: 30,
+    fetchStatus: 'completed',
+    saveStatus: 'completed',
     details: {
       eligibilityCheck: 'ACTIVE - Policy effective through 12/31/2025',
       benefitsVerification: 'Preventive: 100%, Basic: 80%, Major: 50%',
@@ -83,6 +87,8 @@ export const mockData: Transaction[] = [
     runBy: 'Smith AI System',
     dataVerified: ['Patient Name', 'Patient SSN', 'Patient Date of Birth', 'Relationship to Subscriber', 'Subscriber Name', 'Subscriber SSN', 'Subscriber Date of Birth', 'Subscriber ID Number', 'Insurance Company', 'Insurer Type - Primary', 'Insurer Type - Secondary', 'Insurance Address', 'Insurance Phone', 'Employer', 'Group Number', 'Effective Date', 'Renewal Month', 'Yearly Maximum', 'Deductible Per Individual', 'Deductible Per Family', 'Deductible Applies To - Preventative', 'Deductible Applies To - Basic', 'Deductible Applies To - Major', 'Preventative Covered At (%)', 'Preventative Waiting Period', 'Preventative Effective Date', 'Bitewing Frequency'],
     verificationScore: 80,
+    fetchStatus: 'completed',
+    saveStatus: 'completed',
     responseCode: '200',
     endpoint: 'https://api.cigna.com/dental/benefits',
     details: {
@@ -110,6 +116,8 @@ export const mockData: Transaction[] = [
     runBy: 'Smith AI System',
     dataVerified: ['Eligibility', 'Benefits', 'Coverage Limits', 'Deductibles'],
     verificationScore: 100,
+    fetchStatus: 'completed',
+    saveStatus: 'pending',
     phoneNumber: '1-800-555-0188',
     callHistory: [
       {
@@ -612,15 +620,17 @@ Important Notes
         {/* Header */}
         <div className="grid grid-cols-[auto_1fr] gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-xs font-medium">
           <div className="w-6"></div>
-          <div className="grid grid-cols-12 gap-3">
+          <div className="grid grid-cols-14 gap-3">
             <div className="col-span-2">Start Time</div>
             <div className="col-span-1 text-center">Duration</div>
             <div className="col-span-1 text-center">Type</div>
             <div className="col-span-1 text-center">Status</div>
+            <div className="col-span-1 text-center">Fetch</div>
             <div className="col-span-2">Insurance Provider</div>
             <div className="col-span-2">Insurance Rep</div>
             <div className="col-span-1 text-center">Score</div>
             <div className="col-span-2">Run By</div>
+            <div className="col-span-1 text-center">Save</div>
           </div>
         </div>
 
@@ -648,7 +658,7 @@ Important Notes
                     expand_more
                   </span>
                 </div>
-                <div className="grid grid-cols-12 gap-3 items-center text-sm">
+                <div className="grid grid-cols-14 gap-3 items-center text-sm">
                   <div className="col-span-2">
                     <div className="text-slate-900 dark:text-white">{transaction.startTime}</div>
                     <div className="text-xs text-slate-500 dark:text-slate-400">{transaction.requestId}</div>
@@ -659,6 +669,20 @@ Important Notes
                   </div>
                   <div className={`col-span-1 text-center font-semibold text-xs ${getStatusColor(transaction.status)}`}>
                     {transaction.status}
+                  </div>
+                  {/* Fetch Status Badge */}
+                  <div className="col-span-1 flex items-center justify-center">
+                    <div className={`h-6 w-16 flex items-center justify-center gap-0.5 px-2.5 py-0.5 rounded-full ${
+                      transaction.fetchStatus === 'completed'
+                        ? 'bg-green-100 dark:bg-green-900/30'
+                        : 'bg-slate-300 dark:bg-slate-600'
+                    }`}>
+                      {transaction.fetchStatus === 'completed' ? (
+                        <span className="material-symbols-outlined text-green-600 dark:text-green-400 text-[6px]">download</span>
+                      ) : (
+                        <span className="text-slate-600 dark:text-slate-300 text-[8px] font-medium">Fetch</span>
+                      )}
+                    </div>
                   </div>
                   <div className="col-span-2 text-slate-700 dark:text-slate-300">{transaction.insuranceProvider}</div>
                   <div className="col-span-2 text-slate-600 dark:text-slate-400">{transaction.insuranceRep}</div>
@@ -672,6 +696,20 @@ Important Notes
                     </span>
                   </div>
                   <div className="col-span-2 text-slate-700 dark:text-slate-300">{transaction.runBy}</div>
+                  {/* Save Status Badge */}
+                  <div className="col-span-1 flex items-center justify-center">
+                    <div className={`h-6 w-16 flex items-center justify-center gap-0.5 px-2.5 py-0.5 rounded-full ${
+                      transaction.saveStatus === 'completed'
+                        ? 'bg-green-100 dark:bg-green-900/30'
+                        : 'bg-slate-300 dark:bg-slate-600'
+                    }`}>
+                      {transaction.saveStatus === 'completed' ? (
+                        <span className="material-symbols-outlined text-green-600 dark:text-green-400 text-[6px]">save</span>
+                      ) : (
+                        <span className="text-slate-600 dark:text-slate-300 text-[8px] font-medium">Save</span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
 

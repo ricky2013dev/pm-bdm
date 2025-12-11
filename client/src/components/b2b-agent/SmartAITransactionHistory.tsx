@@ -625,12 +625,12 @@ Important Notes
             <div className="col-span-1 text-center">Duration</div>
             <div className="col-span-1 text-center">Type</div>
             <div className="col-span-1 text-center">Status</div>
-            <div className="col-span-1 text-center">Fetch</div>
+            <div className="col-span-1 text-center">From</div>
             <div className="col-span-2">Insurance Provider</div>
             <div className="col-span-2">Insurance Rep</div>
             <div className="col-span-1 text-center">Score</div>
             <div className="col-span-2">Run By</div>
-            <div className="col-span-1 text-center">Save</div>
+            <div className="col-span-1 text-center">To</div>
           </div>
         </div>
 
@@ -670,7 +670,7 @@ Important Notes
                   <div className={`col-span-1 text-center font-semibold text-xs ${getStatusColor(transaction.status)}`}>
                     {transaction.status}
                   </div>
-                  {/* Fetch Status Badge */}
+                  {/* From Status Badge */}
                   <div className="col-span-1 flex items-center justify-center">
                     <div className={`h-6 w-16 flex items-center justify-center gap-0.5 px-2.5 py-0.5 rounded-full ${
                       transaction.fetchStatus === 'completed'
@@ -678,9 +678,9 @@ Important Notes
                         : 'bg-slate-300 dark:bg-slate-600'
                     }`}>
                       {transaction.fetchStatus === 'completed' ? (
-                        <span className="material-symbols-outlined text-green-600 dark:text-green-400 text-[6px]">download</span>
+                        <span className="material-symbols-outlined text-green-600 dark:text-green-400 text-[6px]">logout</span>
                       ) : (
-                        <span className="text-slate-600 dark:text-slate-300 text-[8px] font-medium">Fetch</span>
+                        <span className="text-slate-600 dark:text-slate-300 text-[8px] font-medium">From</span>
                       )}
                     </div>
                   </div>
@@ -696,7 +696,7 @@ Important Notes
                     </span>
                   </div>
                   <div className="col-span-2 text-slate-700 dark:text-slate-300">{transaction.runBy}</div>
-                  {/* Save Status Badge */}
+                  {/* To Status Badge */}
                   <div className="col-span-1 flex items-center justify-center">
                     <div className={`h-6 w-16 flex items-center justify-center gap-0.5 px-2.5 py-0.5 rounded-full ${
                       transaction.saveStatus === 'completed'
@@ -704,9 +704,9 @@ Important Notes
                         : 'bg-slate-300 dark:bg-slate-600'
                     }`}>
                       {transaction.saveStatus === 'completed' ? (
-                        <span className="material-symbols-outlined text-green-600 dark:text-green-400 text-[6px]">save</span>
+                        <span className="material-symbols-outlined text-green-600 dark:text-green-400 text-[6px]">login</span>
                       ) : (
-                        <span className="text-slate-600 dark:text-slate-300 text-[8px] font-medium">Save</span>
+                        <span className="text-slate-600 dark:text-slate-300 text-[8px] font-medium">To</span>
                       )}
                     </div>
                   </div>

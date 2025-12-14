@@ -45,15 +45,17 @@ async function buildAll() {
     ...Object.keys(pkg.devDependencies || {}),
   ];
   const externals = allDeps.filter((dep) => !allowlist.includes(dep));
-
-  await esbuild({
+await esbuild({
     entryPoints: ["server/index.ts"],
     platform: "node",
     bundle: true,
-    format: "cjs",
-    outfile: "dist/index.cjs",
+    format: "esm",
+    outfile: "dist/index.mjs",
     define: {
       "process.env.NODE_ENV": '"production"',
+    },
+    banner: {
+      js: "import { createRequire } from 'module';const require = createRequire(import.meta.url);const __filename = fileURLToPath(import.meta.url);const __dirname = dirname(__filename);",
     },
     minify: true,
     external: externals,

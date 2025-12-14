@@ -55,17 +55,20 @@ const PatientDetailPage: React.FC = () => {
       if (stepFilters.length > 0) {
         const getPatientVerificationStep = (p: Patient) => {
           if (!p.verificationStatus) return 0;
-          const { eligibilityCheck, benefitsVerification } = p.verificationStatus;
+          const { fetchPMS, documentAnalysis, apiVerification, callCenter, saveToPMS } = p.verificationStatus;
 
-          if (benefitsVerification === 'completed' || benefitsVerification === 'in_progress') return 2;
-          if (eligibilityCheck === 'completed' || eligibilityCheck === 'in_progress') return 1;
+          if (saveToPMS === 'completed' || saveToPMS === 'in_progress') return 5;
+          if (callCenter === 'completed' || callCenter === 'in_progress') return 4;
+          if (apiVerification === 'completed' || apiVerification === 'in_progress') return 3;
+          if (documentAnalysis === 'completed' || documentAnalysis === 'in_progress') return 2;
+          if (fetchPMS === 'completed' || fetchPMS === 'in_progress') return 1;
           return 0;
         };
 
         const verificationStep = getPatientVerificationStep(patient);
         const matchesAnyStepFilter = stepFilters.some(filter => {
-          if (filter === 'Eligibility') return verificationStep === 1;
-          if (filter === 'Verification') return verificationStep === 2;
+          if (filter === 'Eligibility') return verificationStep >= 1;
+          if (filter === 'Verification') return verificationStep >= 3;
           return false;
         });
 

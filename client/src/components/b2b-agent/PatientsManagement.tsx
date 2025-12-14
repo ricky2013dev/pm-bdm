@@ -21,26 +21,28 @@ const PatientsManagement: React.FC = () => {
         return;
       }
 
-      const { eligibilityCheck, benefitsVerification, aiCallVerification, sendToPMS } = patient.verificationStatus;
+      const { fetchPMS, documentAnalysis, apiVerification, callCenter, saveToPMS } = patient.verificationStatus;
 
       // Fully verified
-      if (sendToPMS === 'completed') {
+      if (saveToPMS === 'completed') {
         verified++;
       }
       // In progress (any step in progress)
       else if (
-        eligibilityCheck === 'in_progress' ||
-        benefitsVerification === 'in_progress' ||
-        aiCallVerification === 'in_progress' ||
-        sendToPMS === 'in_progress'
+        fetchPMS === 'in_progress' ||
+        documentAnalysis === 'in_progress' ||
+        apiVerification === 'in_progress' ||
+        callCenter === 'in_progress' ||
+        saveToPMS === 'in_progress'
       ) {
         inProgress++;
       }
       // Pending (at least one step completed but not all)
       else if (
-        eligibilityCheck === 'completed' ||
-        benefitsVerification === 'completed' ||
-        aiCallVerification === 'completed'
+        fetchPMS === 'completed' ||
+        documentAnalysis === 'completed' ||
+        apiVerification === 'completed' ||
+        callCenter === 'completed'
       ) {
         pending++;
       }

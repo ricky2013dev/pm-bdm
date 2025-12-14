@@ -8,7 +8,9 @@
     "build": "tsx script/build.ts",
     "start": "NODE_ENV=production node dist/index.cjs",
     "check": "tsc",
+     "refresh-dates": "node mockupdata/generateDynamicDates.cjs",
     "db:push": "drizzle-kit push"
+    
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

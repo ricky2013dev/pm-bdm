@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { VERIFICATION_STATUS_LABELS } from '@/constants/verificationStatus';
+import { getTransactionTypeColor } from '@/constants/transactionTypes';
 import { ImageViewerWithModal } from './ImageViewer';
 
 interface CallCommunication {
@@ -12,7 +13,7 @@ interface CallCommunication {
 interface Transaction {
   id: string;
   requestId: string;
-  type: 'API' | 'CALL' | 'FAX';
+  type: 'FETCH' | 'API' | 'CALL' | 'FAX' | 'SAVE';
   method: string;
   startTime: string;
   endTime: string;
@@ -43,9 +44,37 @@ interface Transaction {
 }
 
 export const mockData: Transaction[] = [
-  // FAX DOCUMENT ANALYSIS
+  // FETCH PMS
   {
     id: '0',
+    requestId: 'REQ-2025-11-28-0800',
+    type: 'FETCH',
+    method: 'GET /pms/patient/data',
+    startTime: '2025-11-28 08:00:00',
+    endTime: '2025-11-28 08:02:15',
+    duration: '2m 15s',
+    status: 'SUCCESS',
+    patientId: 'P002',
+    patientName: 'Sarah Johnson',
+    insuranceProvider: '-',
+    insuranceRep: '-',
+    runBy: 'Smith AI System',
+    dataVerified: ['Patient ID', 'Patient Name', 'DOB', 'Contact Info', 'Medical History'],
+    verificationScore: 100,
+    fetchStatus: 'completed',
+    saveStatus: 'pending',
+    endpoint: 'https://pms.dental.local/api/patient/data',
+    details: {
+      eligibilityCheck: 'Patient record retrieved from PMS',
+      benefitsVerification: 'Data synchronized with local database',
+      coverageDetails: 'Patient active in system',
+      deductibleInfo: 'Initial data fetch completed',
+      transcript: 'Fetch PMS data completed successfully. Patient information retrieved and validated.'
+    }
+  },
+  // FAX DOCUMENT ANALYSIS
+  {
+    id: '1',
     requestId: 'REQ-2025-11-28-0915',
     type: 'FAX',
     method: 'FAX /fax/document-analysis',
@@ -72,7 +101,7 @@ export const mockData: Transaction[] = [
   },
   // API SUCCESS
   {
-    id: '1',
+    id: '2',
     requestId: 'REQ-2025-11-28-0930',
     type: 'API',
     method: 'POST /api/benefits/query',
@@ -101,7 +130,7 @@ export const mockData: Transaction[] = [
   },
   // CALL SUCCESS
   {
-    id: '2',
+    id: '3',
     requestId: 'REQ-2025-11-28-1045',
     type: 'CALL',
     method: 'VOICE /ai-agent/verify',
@@ -222,6 +251,34 @@ export const mockData: Transaction[] = [
       benefitsVerification: 'Preventive: 100%, Basic: 80%, Major: 50%',
       coverageDetails: 'Annual Maximum: $2,000 | Used: $0 | Remaining: $2,000',
       deductibleInfo: 'Individual Deductible: $50 | Met: $0'
+    }
+  },
+  // SAVE TO PMS
+  {
+    id: '4',
+    requestId: 'REQ-2025-11-28-1135',
+    type: 'SAVE',
+    method: 'POST /pms/patient/save',
+    startTime: '2025-11-28 11:35:00',
+    endTime: '2025-11-28 11:36:30',
+    duration: '1m 30s',
+    status: 'SUCCESS',
+    patientId: 'P002',
+    patientName: 'Sarah Johnson',
+    insuranceProvider: '-',
+    insuranceRep: '-',
+    runBy: 'Smith AI System',
+    dataVerified: ['Verified Data', 'Insurance Benefits', 'Coverage Details', 'Deductible Info', 'Eligibility Status'],
+    verificationScore: 100,
+    fetchStatus: 'completed',
+    saveStatus: 'completed',
+    endpoint: 'https://pms.dental.local/api/patient/save',
+    details: {
+      eligibilityCheck: 'All verification data saved to PMS',
+      benefitsVerification: 'Insurance benefits synchronized with PMS',
+      coverageDetails: 'Coverage details updated in patient record',
+      deductibleInfo: 'Deductible information recorded in system',
+      transcript: 'Save to PMS completed successfully. All verified information has been synchronized with the patient management system.'
     }
   }
 ];
@@ -540,16 +597,11 @@ Important Notes
   };
 
   const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'API':
-        return 'text-blue-600 dark:text-blue-400';
-      case 'CALL':
-        return 'text-purple-600 dark:text-purple-400';
-      case 'FAX':
-        return 'text-cyan-600 dark:text-cyan-400';
-      default:
-        return 'text-slate-600 dark:text-slate-400';
+    // Handle FAX type which is not in the shared module
+    if (type === 'FAX') {
+      return 'text-cyan-600 dark:text-cyan-400';
     }
+    return getTransactionTypeColor(type as any) || 'text-slate-600 dark:text-slate-400';
   };
 
   return (
@@ -620,17 +672,15 @@ Important Notes
         {/* Header */}
         <div className="grid grid-cols-[auto_1fr] gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-xs font-medium">
           <div className="w-6"></div>
-          <div className="grid grid-cols-14 gap-3">
+          <div className="grid grid-cols-12 gap-3">
             <div className="col-span-2">Start Time</div>
             <div className="col-span-1 text-center">Duration</div>
             <div className="col-span-1 text-center">Type</div>
             <div className="col-span-1 text-center">Status</div>
-            <div className="col-span-1 text-center">From</div>
             <div className="col-span-2">Insurance Provider</div>
             <div className="col-span-2">Insurance Rep</div>
             <div className="col-span-1 text-center">Score</div>
             <div className="col-span-2">Run By</div>
-            <div className="col-span-1 text-center">To</div>
           </div>
         </div>
 
@@ -658,7 +708,7 @@ Important Notes
                     expand_more
                   </span>
                 </div>
-                <div className="grid grid-cols-14 gap-3 items-center text-sm">
+                <div className="grid grid-cols-12 gap-3 items-center text-sm">
                   <div className="col-span-2">
                     <div className="text-slate-900 dark:text-white">{transaction.startTime}</div>
                     <div className="text-xs text-slate-500 dark:text-slate-400">{transaction.requestId}</div>
@@ -669,20 +719,6 @@ Important Notes
                   </div>
                   <div className={`col-span-1 text-center font-semibold text-xs ${getStatusColor(transaction.status)}`}>
                     {transaction.status}
-                  </div>
-                  {/* From Status Badge */}
-                  <div className="col-span-1 flex items-center justify-center">
-                    <div className={`h-6 w-16 flex items-center justify-center gap-0.5 px-2.5 py-0.5 rounded-full ${
-                      transaction.fetchStatus === 'completed'
-                        ? 'bg-green-100 dark:bg-green-900/30'
-                        : 'bg-slate-300 dark:bg-slate-600'
-                    }`}>
-                      {transaction.fetchStatus === 'completed' ? (
-                        <span className="material-symbols-outlined text-green-600 dark:text-green-400 text-[6px]">logout</span>
-                      ) : (
-                        <span className="text-slate-600 dark:text-slate-300 text-[8px] font-medium">From</span>
-                      )}
-                    </div>
                   </div>
                   <div className="col-span-2 text-slate-700 dark:text-slate-300">{transaction.insuranceProvider}</div>
                   <div className="col-span-2 text-slate-600 dark:text-slate-400">{transaction.insuranceRep}</div>
@@ -696,20 +732,6 @@ Important Notes
                     </span>
                   </div>
                   <div className="col-span-2 text-slate-700 dark:text-slate-300">{transaction.runBy}</div>
-                  {/* To Status Badge */}
-                  <div className="col-span-1 flex items-center justify-center">
-                    <div className={`h-6 w-16 flex items-center justify-center gap-0.5 px-2.5 py-0.5 rounded-full ${
-                      transaction.saveStatus === 'completed'
-                        ? 'bg-green-100 dark:bg-green-900/30'
-                        : 'bg-slate-300 dark:bg-slate-600'
-                    }`}>
-                      {transaction.saveStatus === 'completed' ? (
-                        <span className="material-symbols-outlined text-green-600 dark:text-green-400 text-[6px]">login</span>
-                      ) : (
-                        <span className="text-slate-600 dark:text-slate-300 text-[8px] font-medium">To</span>
-                      )}
-                    </div>
-                  </div>
                 </div>
               </div>
 

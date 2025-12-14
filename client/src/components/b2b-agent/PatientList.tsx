@@ -66,31 +66,37 @@ const PatientList: React.FC<PatientListProps> = ({
       return { text: VERIFICATION_STATUS_LABELS.NOT_STARTED, color: 'text-slate-400', step: 0, percentage: 0 };
     }
 
-    const { eligibilityCheck, benefitsVerification, aiCallVerification, sendToPMS } = patient.verificationStatus;
+    const { fetchPMS, documentAnalysis, apiVerification, callCenter, saveToPMS } = patient.verificationStatus;
 
-    if (sendToPMS === 'completed') {
-      return { text: VERIFICATION_STATUS_LABELS.VERIFIED, color: 'text-status-green', step: 4, percentage: 100 };
+    if (saveToPMS === 'completed') {
+      return { text: VERIFICATION_STATUS_LABELS.COMPLETED, color: 'text-status-green', step: 5, percentage: 100 };
     }
-    if (sendToPMS === 'in_progress') {
-      return { text: VERIFICATION_STATUS_LABELS.SENDING_TO_PMS, color: 'text-primary', step: 4, percentage: 87 };
+    if (saveToPMS === 'in_progress') {
+      return { text: VERIFICATION_STATUS_LABELS.SAVE_TO_PMS, color: 'text-primary', step: 5, percentage: 90 };
     }
-    if (aiCallVerification === 'completed') {
-      return { text: VERIFICATION_STATUS_LABELS.PMS_PENDING, color: 'text-status-orange', step: 4, percentage: 75 };
+    if (callCenter === 'completed') {
+      return { text: VERIFICATION_STATUS_LABELS.SAVE_TO_PMS, color: 'text-status-orange', step: 4, percentage: 80 };
     }
-    if (aiCallVerification === 'in_progress') {
-      return { text: VERIFICATION_STATUS_LABELS.AI_CALL_VERIFICATION, color: 'text-primary', step: 3, percentage: 62 };
+    if (callCenter === 'in_progress') {
+      return { text: VERIFICATION_STATUS_LABELS.CALL_CENTER, color: 'text-primary', step: 4, percentage: 70 };
     }
-    if (benefitsVerification === 'completed') {
-      return { text: VERIFICATION_STATUS_LABELS.AI_CALL_PENDING, color: 'text-status-orange', step: 3, percentage: 50 };
+    if (apiVerification === 'completed') {
+      return { text: VERIFICATION_STATUS_LABELS.CALL_CENTER, color: 'text-status-orange', step: 3, percentage: 60 };
     }
-    if (benefitsVerification === 'in_progress') {
-      return { text: VERIFICATION_STATUS_LABELS.BENEFITS_CHECK, color: 'text-primary', step: 2, percentage: 37 };
+    if (apiVerification === 'in_progress') {
+      return { text: VERIFICATION_STATUS_LABELS.API_VERIFICATION, color: 'text-primary', step: 3, percentage: 50 };
     }
-    if (eligibilityCheck === 'completed') {
-      return { text: VERIFICATION_STATUS_LABELS.BENEFITS_PENDING, color: 'text-status-orange', step: 2, percentage: 25 };
+    if (documentAnalysis === 'completed') {
+      return { text: VERIFICATION_STATUS_LABELS.API_VERIFICATION, color: 'text-status-orange', step: 2, percentage: 40 };
     }
-    if (eligibilityCheck === 'in_progress') {
-      return { text: VERIFICATION_STATUS_LABELS.ELIGIBILITY_CHECK, color: 'text-primary', step: 1, percentage: 12 };
+    if (documentAnalysis === 'in_progress') {
+      return { text: VERIFICATION_STATUS_LABELS.DOCUMENT_ANALYSIS, color: 'text-primary', step: 2, percentage: 30 };
+    }
+    if (fetchPMS === 'completed') {
+      return { text: VERIFICATION_STATUS_LABELS.DOCUMENT_ANALYSIS, color: 'text-status-orange', step: 1, percentage: 20 };
+    }
+    if (fetchPMS === 'in_progress') {
+      return { text: VERIFICATION_STATUS_LABELS.FETCH_PMS, color: 'text-primary', step: 1, percentage: 10 };
     }
 
     return { text: VERIFICATION_STATUS_LABELS.NOT_STARTED, color: 'text-slate-400', step: 0, percentage: 0 };
@@ -136,23 +142,25 @@ const PatientList: React.FC<PatientListProps> = ({
       return { label: VERIFICATION_STATUS_LABELS.NOT_STARTED, color: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400' };
     }
 
-    const { eligibilityCheck, benefitsVerification, aiCallVerification, sendToPMS } = patient.verificationStatus;
+    const { fetchPMS, documentAnalysis, apiVerification, callCenter, saveToPMS } = patient.verificationStatus;
 
-    if (sendToPMS === 'completed') {
-      return { label: VERIFICATION_STATUS_LABELS.VERIFIED, color: 'bg-status-green/10 text-status-green' };
+    if (saveToPMS === 'completed') {
+      return { label: VERIFICATION_STATUS_LABELS.COMPLETED, color: 'bg-status-green/10 text-status-green' };
     }
     if (
-      eligibilityCheck === 'in_progress' ||
-      benefitsVerification === 'in_progress' ||
-      aiCallVerification === 'in_progress' ||
-      sendToPMS === 'in_progress'
+      fetchPMS === 'in_progress' ||
+      documentAnalysis === 'in_progress' ||
+      apiVerification === 'in_progress' ||
+      callCenter === 'in_progress' ||
+      saveToPMS === 'in_progress'
     ) {
       return { label: VERIFICATION_STATUS_LABELS.IN_PROGRESS, color: 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' };
     }
     if (
-      eligibilityCheck === 'completed' ||
-      benefitsVerification === 'completed' ||
-      aiCallVerification === 'completed'
+      fetchPMS === 'completed' ||
+      documentAnalysis === 'completed' ||
+      apiVerification === 'completed' ||
+      callCenter === 'completed'
     ) {
       return { label: VERIFICATION_STATUS_LABELS.PENDING, color: 'bg-status-orange/10 text-status-orange' };
     }
@@ -442,12 +450,12 @@ const PatientList: React.FC<PatientListProps> = ({
                       <div
                         className={`h-1.5 rounded-full transition-all ${
                           verificationStatus.percentage === 100
-                            ? 'bg-status-green'
+                            ? 'w-full bg-status-green'
                             : verificationStatus.percentage > 0
                             ? 'bg-blue-500'
                             : 'bg-slate-300 dark:bg-slate-600'
                         }`}
-                        style={{ width: `${verificationStatus.percentage}%` }}
+                        style={verificationStatus.percentage === 100 ? {} : { width: `${verificationStatus.percentage}%` }}
                       />
                     </div>
                   </div>

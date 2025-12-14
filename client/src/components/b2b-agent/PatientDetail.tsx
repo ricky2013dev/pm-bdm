@@ -73,11 +73,6 @@ const PatientDetail: React.FC<PatientDetailProps> = ({
   // Insurance editing states
   const [editedInsurance, setEditedInsurance] = useState<Insurance[]>([]);
 
-  // Send to PMS state
-  const [isSendingToPMS, setIsSendingToPMS] = useState(false);
-  const [sendProgress, setSendProgress] = useState(0);
-  const [sendMessage, setSendMessage] = useState('');
-
   // Document Analysis AI state
   const [showDocumentUploadModal, setShowDocumentUploadModal] = useState(false);
   const [uploadedDocuments, setUploadedDocuments] = useState<File[]>([]);
@@ -94,124 +89,84 @@ const PatientDetail: React.FC<PatientDetailProps> = ({
     const status = patient.verificationStatus;
     if (!status) return 1;
 
-    if (status.aiCallVerification === 'completed') return 3;
-    if (status.aiCallVerification === 'in_progress') return 3;
-    if (status.benefitsVerification === 'completed') return 3;
-    if (status.benefitsVerification === 'in_progress') return 2;
-    if (status.eligibilityCheck === 'completed') return 2;
-    if (status.eligibilityCheck === 'in_progress') return 1;
+    if (status.saveToPMS === 'completed') return 5;
+    if (status.saveToPMS === 'in_progress') return 5;
+    if (status.callCenter === 'completed') return 4;
+    if (status.callCenter === 'in_progress') return 4;
+    if (status.apiVerification === 'completed') return 3;
+    if (status.apiVerification === 'in_progress') return 3;
+    if (status.documentAnalysis === 'completed') return 2;
+    if (status.documentAnalysis === 'in_progress') return 2;
+    if (status.fetchPMS === 'completed') return 2;
+    if (status.fetchPMS === 'in_progress') return 1;
     return 1;
   };
 
-  const getStepConfig = (stepKey: 'eligibilityCheck' | 'benefitsVerification' | 'aiCallVerification' | 'sendToPMS') => {
+  const getStepConfig = (stepKey: 'fetchPMS' | 'documentAnalysis' | 'apiVerification' | 'callCenter' | 'saveToPMS') => {
     const status = patient.verificationStatus?.[stepKey] || 'pending';
     const configs = {
-      eligibilityCheck: {
-        icon: status === 'completed' ? 'check' : status === 'in_progress' ? 'sync' : 'schedule',
+      fetchPMS: {
+        icon: status === 'completed' ? 'check' : status === 'in_progress' ? 'sync' : 'download',
         bgColor: status === 'completed' ? 'bg-green-500 dark:bg-green-600' : status === 'in_progress' ? 'bg-blue-500 dark:bg-blue-600' : 'bg-slate-300 dark:bg-slate-600',
         textColor: status === 'completed' ? 'text-white' : status === 'in_progress' ? 'text-white' : 'text-slate-600 dark:text-slate-400',
-        label: VERIFICATION_STATUS_LABELS.ELIGIBILITY_CHECK,
+        label: VERIFICATION_STATUS_LABELS.FETCH_PMS,
         statusText: status === 'completed' ? 'Completed' : status === 'in_progress' ? 'In Progress' : 'Pending',
         statusColor: status === 'completed' ? 'text-green-600 dark:text-green-400' : status === 'in_progress' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400',
       },
-      benefitsVerification: {
-        icon: status === 'completed' ? 'check' : status === 'in_progress' ? 'sync' : 'schedule',
+      documentAnalysis: {
+        icon: status === 'completed' ? 'check' : status === 'in_progress' ? 'sync' : 'description',
         bgColor: status === 'completed' ? 'bg-green-500 dark:bg-green-600' : status === 'in_progress' ? 'bg-blue-500 dark:bg-blue-600' : 'bg-slate-300 dark:bg-slate-600',
         textColor: status === 'completed' ? 'text-white' : status === 'in_progress' ? 'text-white' : 'text-slate-600 dark:text-slate-400',
-        label: 'API Verification',
+        label: VERIFICATION_STATUS_LABELS.DOCUMENT_ANALYSIS,
         statusText: status === 'completed' ? 'Completed' : status === 'in_progress' ? 'In Progress' : 'Pending',
         statusColor: status === 'completed' ? 'text-green-600 dark:text-green-400' : status === 'in_progress' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400',
       },
-      aiCallVerification: {
-        icon: status === 'completed' ? 'check' : status === 'in_progress' ? 'sync' : 'schedule',
+      apiVerification: {
+        icon: status === 'completed' ? 'check' : status === 'in_progress' ? 'sync' : 'api',
         bgColor: status === 'completed' ? 'bg-green-500 dark:bg-green-600' : status === 'in_progress' ? 'bg-blue-500 dark:bg-blue-600' : 'bg-slate-300 dark:bg-slate-600',
         textColor: status === 'completed' ? 'text-white' : status === 'in_progress' ? 'text-white' : 'text-slate-600 dark:text-slate-400',
-        label: 'AI Call Verification',
+        label: VERIFICATION_STATUS_LABELS.API_VERIFICATION,
         statusText: status === 'completed' ? 'Completed' : status === 'in_progress' ? 'In Progress' : 'Pending',
         statusColor: status === 'completed' ? 'text-green-600 dark:text-green-400' : status === 'in_progress' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400',
       },
-      sendToPMS: {
-        icon: status === 'completed' ? 'check' : status === 'in_progress' ? 'sync' : 'schedule',
+      callCenter: {
+        icon: status === 'completed' ? 'check' : status === 'in_progress' ? 'sync' : 'phone',
         bgColor: status === 'completed' ? 'bg-green-500 dark:bg-green-600' : status === 'in_progress' ? 'bg-blue-500 dark:bg-blue-600' : 'bg-slate-300 dark:bg-slate-600',
         textColor: status === 'completed' ? 'text-white' : status === 'in_progress' ? 'text-white' : 'text-slate-600 dark:text-slate-400',
-        label: 'Complete Verification',
+        label: VERIFICATION_STATUS_LABELS.CALL_CENTER,
         statusText: status === 'completed' ? 'Completed' : status === 'in_progress' ? 'In Progress' : 'Pending',
-        statusColor: status === 'completed' ? 'text-status-green' : status === 'in_progress' ? 'text-primary' : 'text-slate-500 dark:text-slate-400',
+        statusColor: status === 'completed' ? 'text-green-600 dark:text-green-400' : status === 'in_progress' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400',
+      },
+      saveToPMS: {
+        icon: status === 'completed' ? 'check' : status === 'in_progress' ? 'sync' : 'save',
+        bgColor: status === 'completed' ? 'bg-green-500 dark:bg-green-600' : status === 'in_progress' ? 'bg-blue-500 dark:bg-blue-600' : 'bg-slate-300 dark:bg-slate-600',
+        textColor: status === 'completed' ? 'text-white' : status === 'in_progress' ? 'text-white' : 'text-slate-600 dark:text-slate-400',
+        label: VERIFICATION_STATUS_LABELS.SAVE_TO_PMS,
+        statusText: status === 'completed' ? 'Completed' : status === 'in_progress' ? 'In Progress' : 'Pending',
+        statusColor: status === 'completed' ? 'text-green-600 dark:text-green-400' : status === 'in_progress' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400',
       }
     };
     return configs[stepKey];
   };
 
   // Check if each step is completed
-  const isPullBasicDataCompleted = () => {
-    return patient.verificationStatus?.eligibilityCheck === 'completed';
+  const isFetchPMSCompleted = () => {
+    return patient.verificationStatus?.fetchPMS === 'completed';
+  };
+
+  const isDocumentAnalysisCompleted = () => {
+    return patient.verificationStatus?.documentAnalysis === 'completed';
   };
 
   const isAPIVerificationCompleted = () => {
-    return patient.verificationStatus?.benefitsVerification === 'completed';
+    return patient.verificationStatus?.apiVerification === 'completed';
   };
 
-  const isAICallCompleted = () => {
-    return patient.verificationStatus?.aiCallVerification === 'completed';
+  const isCallCenterCompleted = () => {
+    return patient.verificationStatus?.callCenter === 'completed';
   };
 
-  // Check if status is 100% (all 3 steps completed)
-  const isVerification100Percent = () => {
-    return isAICallCompleted();
-  };
-
-  const canSendToPMS = () => {
-    return isVerification100Percent();
-  };
-
-  const handleSendToPMS = () => {
-    setIsSendingToPMS(true);
-    setSendProgress(0);
-    setSendMessage('Initializing secure connection to Practice Management System...');
-
-    // Stage 1: Connecting (0-20%)
-    setTimeout(() => {
-      setSendProgress(20);
-      setSendMessage('Authenticating with PMS credentials...');
-    }, 600);
-
-    // Stage 2: Authenticating (20-40%)
-    setTimeout(() => {
-      setSendProgress(40);
-      setSendMessage('Validating patient data integrity...');
-    }, 1200);
-
-    // Stage 3: Validating (40-60%)
-    setTimeout(() => {
-      setSendProgress(60);
-      setSendMessage('Preparing insurance verification data for transmission...');
-    }, 1800);
-
-    // Stage 4: Preparing (60-80%)
-    setTimeout(() => {
-      setSendProgress(80);
-      setSendMessage('Transmitting patient record to PMS...');
-    }, 2400);
-
-    // Stage 5: Transmitting (80-95%)
-    setTimeout(() => {
-      setSendProgress(95);
-      setSendMessage('Confirming data receipt and updating records...');
-    }, 3000);
-
-    // Stage 6: Finalizing (95-100%)
-    setTimeout(() => {
-      setSendProgress(100);
-      setSendMessage('Patient data successfully transmitted to PMS. Record updated.');
-    }, 3600);
-
-    // Close modal
-    setTimeout(() => {
-      setIsSendingToPMS(false);
-      setSendProgress(0);
-      setSendMessage('');
-    }, 4600);
-  };
+  // Check if status is 100% (all 5 steps completed)
 
   const handleDocumentUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -454,7 +409,7 @@ const PatientDetail: React.FC<PatientDetailProps> = ({
               <span className={`material-symbols-outlined text-base ${
                 isAPIVerificationCompleted()
                   ? 'text-green-500'
-                  : patient.verificationStatus?.benefitsVerification === 'in_progress'
+                  : patient.verificationStatus?.apiVerification === 'in_progress'
                     ? 'text-blue-500'
                     : ''
               }`}>
@@ -470,97 +425,121 @@ const PatientDetail: React.FC<PatientDetailProps> = ({
               title="Start AI call verification (can re-run)"
             >
               <span className={`material-symbols-outlined text-base ${
-                isAICallCompleted()
+                isCallCenterCompleted()
                   ? 'text-green-500'
-                  : patient.verificationStatus?.aiCallVerification === 'in_progress'
+                  : patient.verificationStatus?.callCenter === 'in_progress'
                     ? 'text-blue-500'
                     : ''
               }`}>
-                {isAICallCompleted() ? 'check_circle' : 'smart_toy'}
+                {isCallCenterCompleted() ? 'check_circle' : 'smart_toy'}
               </span>
               Run AI Call Verification
             </button>
           </div>
 
           {/* Verification Steps Progress - Compact */}
-          <div className="flex items-center gap-4 w-80 ml-auto">
+          <div className="flex items-center gap-4 max-w-2xl flex-1 ml-auto">
             <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
-                  Progress
-                </span>
+              <div className="flex items-center justify-end mb-1">
                 <span className="text-[10px] font-medium text-slate-600 dark:text-slate-400">
-                  Step {getVerificationStep()} of 3
+                  Step {getVerificationStep()} of 5
                 </span>
               </div>
-              {/* Simplified Progress Line */}
+              {/* Simplified Progress Line with 5 Steps */}
               <div className="relative py-1">
-                {/* Connector line segment 1: Step 1 to Step 2 */}
+                {/* Connector lines for 5 steps */}
+                {/* Line 1: Fetch PMS to Document Analysis */}
                 <div
                   className={`absolute top-4 h-0.5 transition-colors ${
-                    isPullBasicDataCompleted()
+                    isFetchPMSCompleted()
                       ? 'bg-green-500'
                       : 'bg-slate-300 dark:bg-slate-600'
                   }`}
-                  style={{ left: '16.67%', width: '33.33%' }}
+                  style={{ left: '10%', width: '18%' }}
                 ></div>
-
-                {/* Connector line segment 2: Step 2 to Step 3 */}
+                {/* Line 2: Document Analysis to API Verification */}
+                <div
+                  className={`absolute top-4 h-0.5 transition-colors ${
+                    isDocumentAnalysisCompleted()
+                      ? 'bg-green-500'
+                      : 'bg-slate-300 dark:bg-slate-600'
+                  }`}
+                  style={{ left: '30%', width: '18%' }}
+                ></div>
+                {/* Line 3: API Verification to Call Center */}
                 <div
                   className={`absolute top-4 h-0.5 transition-colors ${
                     isAPIVerificationCompleted()
                       ? 'bg-green-500'
                       : 'bg-slate-300 dark:bg-slate-600'
                   }`}
-                  style={{ left: '50%', width: '33.33%' }}
+                  style={{ left: '50%', width: '18%' }}
+                ></div>
+                {/* Line 4: Call Center to Save to PMS */}
+                <div
+                  className={`absolute top-4 h-0.5 transition-colors ${
+                    isCallCenterCompleted()
+                      ? 'bg-green-500'
+                      : 'bg-slate-300 dark:bg-slate-600'
+                  }`}
+                  style={{ left: '70%', width: '18%' }}
                 ></div>
 
                 {/* Steps */}
                 <div className="relative flex items-start justify-between">
-                  {/* Step 1 */}
-                  <div className="flex flex-col items-center" style={{ width: '33.33%' }}>
-                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${getStepConfig('eligibilityCheck').bgColor} ${getStepConfig('eligibilityCheck').textColor} shrink-0 relative z-10 border-2 border-white dark:border-slate-900`}>
-                      <span className="material-symbols-outlined text-sm">{getStepConfig('eligibilityCheck').icon}</span>
+                  {/* Step 1 - Fetch PMS */}
+                  <div className="flex flex-col items-center" style={{ width: '20%' }}>
+                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${getStepConfig('fetchPMS').bgColor} ${getStepConfig('fetchPMS').textColor} shrink-0 relative z-10 border-2 border-white dark:border-slate-900`}>
+                      <span className="material-symbols-outlined text-sm">{getStepConfig('fetchPMS').icon}</span>
                     </div>
-                    <p className="text-[9px] text-slate-600 dark:text-slate-400 mt-1 text-center leading-tight px-1">
-                      {getStepConfig('eligibilityCheck').label}
+                    <p className="text-[9px] text-slate-600 dark:text-slate-400 mt-1 text-center leading-tight px-0.5">
+                      {getStepConfig('fetchPMS').label}
                     </p>
                   </div>
 
-                  {/* Step 2 */}
-                  <div className="flex flex-col items-center" style={{ width: '33.33%' }}>
-                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${getStepConfig('benefitsVerification').bgColor} ${getStepConfig('benefitsVerification').textColor} shrink-0 relative z-10 border-2 border-white dark:border-slate-900`}>
-                      <span className="material-symbols-outlined text-sm">{getStepConfig('benefitsVerification').icon}</span>
+                  {/* Step 2 - Document Analysis */}
+                  <div className="flex flex-col items-center" style={{ width: '20%' }}>
+                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${getStepConfig('documentAnalysis').bgColor} ${getStepConfig('documentAnalysis').textColor} shrink-0 relative z-10 border-2 border-white dark:border-slate-900`}>
+                      <span className="material-symbols-outlined text-sm">{getStepConfig('documentAnalysis').icon}</span>
                     </div>
-                    <p className="text-[9px] text-slate-600 dark:text-slate-400 mt-1 text-center leading-tight px-1">
-                      {getStepConfig('benefitsVerification').label}
+                    <p className="text-[9px] text-slate-600 dark:text-slate-400 mt-1 text-center leading-tight px-0.5">
+                      {getStepConfig('documentAnalysis').label}
                     </p>
                   </div>
 
-                  {/* Step 3 */}
-                  <div className="flex flex-col items-center" style={{ width: '33.33%' }}>
-                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${getStepConfig('aiCallVerification').bgColor} ${getStepConfig('aiCallVerification').textColor} shrink-0 relative z-10 border-2 border-white dark:border-slate-900`}>
-                      <span className="material-symbols-outlined text-sm">{getStepConfig('aiCallVerification').icon}</span>
+                  {/* Step 3 - API Verification */}
+                  <div className="flex flex-col items-center" style={{ width: '20%' }}>
+                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${getStepConfig('apiVerification').bgColor} ${getStepConfig('apiVerification').textColor} shrink-0 relative z-10 border-2 border-white dark:border-slate-900`}>
+                      <span className="material-symbols-outlined text-sm">{getStepConfig('apiVerification').icon}</span>
                     </div>
-                    <p className="text-[9px] text-slate-600 dark:text-slate-400 mt-1 text-center leading-tight px-1">
-                      {getStepConfig('aiCallVerification').label}
+                    <p className="text-[9px] text-slate-600 dark:text-slate-400 mt-1 text-center leading-tight px-0.5">
+                      {getStepConfig('apiVerification').label}
+                    </p>
+                  </div>
+
+                  {/* Step 4 - Call Center */}
+                  <div className="flex flex-col items-center" style={{ width: '20%' }}>
+                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${getStepConfig('callCenter').bgColor} ${getStepConfig('callCenter').textColor} shrink-0 relative z-10 border-2 border-white dark:border-slate-900`}>
+                      <span className="material-symbols-outlined text-sm">{getStepConfig('callCenter').icon}</span>
+                    </div>
+                    <p className="text-[9px] text-slate-600 dark:text-slate-400 mt-1 text-center leading-tight px-0.5">
+                      {getStepConfig('callCenter').label}
+                    </p>
+                  </div>
+
+                  {/* Step 5 - Save to PMS */}
+                  <div className="flex flex-col items-center" style={{ width: '20%' }}>
+                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${getStepConfig('saveToPMS').bgColor} ${getStepConfig('saveToPMS').textColor} shrink-0 relative z-10 border-2 border-white dark:border-slate-900`}>
+                      <span className="material-symbols-outlined text-sm">{getStepConfig('saveToPMS').icon}</span>
+                    </div>
+                    <p className="text-[9px] text-slate-600 dark:text-slate-400 mt-1 text-center leading-tight px-0.5">
+                      {getStepConfig('saveToPMS').label}
                     </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Approval Action: Send to PMS - Same line as progress, only show when enabled */}
-            {canSendToPMS() && (
-              <button
-                onClick={handleSendToPMS}
-                className="px-4 py-2 rounded-md flex items-center gap-2 text-xs font-medium transition-all bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 shadow-sm"
-                title="Approve and send verified data to PMS"
-              >
-                <span className="material-symbols-outlined text-base">approval</span>
-                <span className="whitespace-nowrap">Send To PMS</span>
-              </button>
-            )}
           </div>
         </div>
       </div>
@@ -1348,75 +1327,6 @@ const PatientDetail: React.FC<PatientDetailProps> = ({
         onClose={() => setIsCoverageResultsOpen(false)}
         patientName={getFullName()}
       />
-
-      {/* Send to PMS Progress Modal */}
-      {isSendingToPMS && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 w-full max-w-lg mx-4 p-8">
-            {/* Header */}
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-14 h-14 bg-blue-100 dark:bg-blue-900/40 rounded-xl flex items-center justify-center">
-                <span className="material-symbols-outlined text-3xl text-blue-600 dark:text-blue-400 animate-pulse">
-                  cloud_upload
-                </span>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                  Sending Data to PMS
-                </h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Transmitting verified patient information
-                </p>
-              </div>
-            </div>
-
-            {/* Progress Message */}
-            <div className="mb-4">
-              <p className="text-sm text-slate-700 dark:text-slate-300 mb-3">
-                {sendMessage}
-              </p>
-
-              {/* Progress Bar */}
-              <div className="relative w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
-                <div
-                  className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500 ease-out rounded-full"
-                  style={{ width: `${sendProgress}%` }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
-                </div>
-              </div>
-
-              {/* Progress Percentage */}
-              <div className="flex items-center justify-between mt-2">
-                <span className="text-xs text-slate-500 dark:text-slate-400">
-                  Progress
-                </span>
-                <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">
-                  {sendProgress}%
-                </span>
-              </div>
-            </div>
-
-            {/* Status Indicators */}
-            <div className="flex items-center gap-2 pt-4 border-t border-slate-200 dark:border-slate-700">
-              <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                <span>Encrypted Transfer</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
-                <span>Real-time Sync</span>
-              </div>
-              {sendProgress === 100 && (
-                <div className="flex items-center gap-2 text-xs text-green-600 dark:text-green-400 ml-auto">
-                  <span className="material-symbols-outlined text-sm">check_circle</span>
-                  <span className="font-semibold">Complete</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Document Upload Modal */}
       {showDocumentUploadModal && (

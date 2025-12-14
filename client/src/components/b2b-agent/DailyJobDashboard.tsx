@@ -3,9 +3,10 @@ import { useLocation } from 'wouter';
 import { Patient } from '@/types/patient';
 import Header from '@/components/Header';
 import patientsData from '@mockupdata/patients.json';
+import { TRANSACTION_TYPE_STYLES } from '@/constants/transactionTypes';
 
 interface JobStep {
-  id: 'analysis' | 'api_call' | 'call_center';
+  id: 'fetch_pms' | 'analysis' | 'api_call' | 'call_center' | 'save_pms';
   label: string;
   icon: string;
 }
@@ -36,9 +37,11 @@ const DailyJobDashboard: React.FC<DailyJobDashboardProps> = ({ patients: patient
   const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
 
   const jobSteps: JobStep[] = [
+    { id: 'fetch_pms', label: 'Fetch PMS', icon: 'download' },
     { id: 'analysis', label: 'Document Analysis', icon: 'description' },
     { id: 'api_call', label: 'API Verification', icon: 'api' },
-    { id: 'call_center', label: 'Call Center', icon: 'phone' }
+    { id: 'call_center', label: 'Call Center', icon: 'phone' },
+    { id: 'save_pms', label: 'Save To PMS', icon: 'save' }
   ];
 
   // Generate jobs for a specific date
@@ -72,21 +75,35 @@ const DailyJobDashboard: React.FC<DailyJobDashboardProps> = ({ patients: patient
       // For today: mixed status
       const getStepStatus = () => {
         if (isPastDate) {
-          return { analysis: 'completed' as const, api_call: 'completed' as const, call_center: 'completed' as const };
+          return {
+            fetch_pms: 'completed' as const,
+            analysis: 'completed' as const,
+            api_call: 'completed' as const,
+            call_center: 'completed' as const,
+            save_pms: 'completed' as const
+          };
         } else if (isFutureDate) {
-          return { analysis: 'pending' as const, api_call: 'pending' as const, call_center: 'pending' as const };
+          return {
+            fetch_pms: 'pending' as const,
+            analysis: 'pending' as const,
+            api_call: 'pending' as const,
+            call_center: 'pending' as const,
+            save_pms: 'pending' as const
+          };
         } else {
           return {
-            analysis: rng > 40 ? 'completed' as const : rng > 20 ? 'in_progress' as const : 'pending' as const,
-            api_call: rng > 55 ? 'completed' as const : rng > 30 ? 'in_progress' as const : 'pending' as const,
-            call_center: rng > 70 ? 'completed' as const : rng > 40 ? 'in_progress' as const : 'pending' as const,
+            fetch_pms: rng > 30 ? 'completed' as const : 'in_progress' as const,
+            analysis: rng > 40 ? 'completed' as const : 'in_progress' as const,
+            api_call: rng > 55 ? 'completed' as const : 'in_progress' as const,
+            call_center: rng > 70 ? 'completed' as const : 'in_progress' as const,
+            save_pms: rng > 80 ? 'completed' as const : 'in_progress' as const
           };
         }
       };
 
-      // Get the patient's first scheduled appointment date
-      const scheduledAppointment = patient.appointments?.find(apt => apt.status === 'scheduled');
-      const appointmentDate = scheduledAppointment ? new Date(scheduledAppointment.date) : null;
+      // Set appointment date to 1 week after job start date
+      const appointmentDate = new Date(startDateObj);
+      appointmentDate.setDate(appointmentDate.getDate() + 7);
 
       return {
         patient,
@@ -126,7 +143,8 @@ const DailyJobDashboard: React.FC<DailyJobDashboardProps> = ({ patients: patient
       }
     }
 
-    return jobs;
+    // Sort by latest time first
+    return jobs.sort((a, b) => b.jobDate.getTime() - a.jobDate.getTime());
   }, [selectedDate, viewMode, patients]);
 
   const stats = useMemo(() => {
@@ -220,24 +238,41 @@ const DailyJobDashboard: React.FC<DailyJobDashboardProps> = ({ patients: patient
     const seed = job.jobDate.getTime();
     const insuranceProvider = job.patient.insurance?.[0]?.provider || 'Cigna Dental';
 
-    // FAX transaction
-    if (job.steps.analysis === 'completed') {
+    // Fetch PMS transaction
+    if (job.steps.fetch_pms !== 'pending') {
       transactions.push({
-        startTime: job.jobDate.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }) + ' ' + job.startTime + ':30',
-        reqId: `REQ-${job.jobDate.toISOString().split('T')[0].replace(/-/g, '')}-${Math.floor(seed % 1000).toString().padStart(4, '0')}`,
+        startTime: job.jobDate.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }) + ' ' + job.startTime + ':00',
+        reqId: `REQ-${job.jobDate.toISOString().split('T')[0].replace(/-/g, '')}-${Math.floor((seed) % 1000).toString().padStart(4, '0')}`,
+        duration: '2m 15s',
+        type: 'FETCH',
+        status: job.steps.fetch_pms === 'completed' ? 'SUCCESS' : 'IN_PROGRESS',
+        insuranceProvider: '-',
+        insuranceRep: '-',
+        score: '100%',
+        runBy: 'Smith AI System'
+      });
+    }
+
+    // Document Analysis transaction
+    if (job.steps.analysis !== 'pending') {
+      const analysisStartTime = new Date(job.jobDate.getTime() + 3 * 60000); // 3 minutes after job start
+      transactions.push({
+        startTime: analysisStartTime.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }) + ' ' +
+          `${String(analysisStartTime.getHours()).padStart(2, '0')}:${String(analysisStartTime.getMinutes()).padStart(2, '0')}:30`,
+        reqId: `REQ-${job.jobDate.toISOString().split('T')[0].replace(/-/g, '')}-${Math.floor((seed + 50) % 1000).toString().padStart(4, '0')}`,
         duration: '5m 25s',
-        type: 'FAX',
-        status: 'SUCCESS',
+        type: 'ANALYSIS',
+        status: job.steps.analysis === 'completed' ? 'SUCCESS' : 'IN_PROGRESS',
         insuranceProvider,
-        insuranceRep: 'Fax System',
-        score: '30%',
+        insuranceRep: 'Document AI',
+        score: '85%',
         runBy: 'Smith AI System'
       });
     }
 
     // API transaction
     if (job.steps.api_call !== 'pending') {
-      const apiStartTime = new Date(job.jobDate.getTime() + 6 * 60000); // 6 minutes after job start
+      const apiStartTime = new Date(job.jobDate.getTime() + 9 * 60000); // 9 minutes after job start
       transactions.push({
         startTime: apiStartTime.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }) + ' ' +
           `${String(apiStartTime.getHours()).padStart(2, '0')}:${String(apiStartTime.getMinutes()).padStart(2, '0')}:15`,
@@ -247,14 +282,14 @@ const DailyJobDashboard: React.FC<DailyJobDashboardProps> = ({ patients: patient
         status: job.steps.api_call === 'completed' ? 'SUCCESS' : 'IN_PROGRESS',
         insuranceProvider,
         insuranceRep: 'API System',
-        score: '80%',
+        score: '92%',
         runBy: 'Smith AI System'
       });
     }
 
-    // CALL transaction
+    // Call Center transaction
     if (job.steps.call_center !== 'pending') {
-      const callStartTime = new Date(job.jobDate.getTime() + 8 * 60000); // 8 minutes after job start
+      const callStartTime = new Date(job.jobDate.getTime() + 12 * 60000); // 12 minutes after job start
       transactions.push({
         startTime: callStartTime.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }) + ' ' +
           `${String(callStartTime.getHours()).padStart(2, '0')}:${String(callStartTime.getMinutes()).padStart(2, '0')}:22`,
@@ -264,6 +299,23 @@ const DailyJobDashboard: React.FC<DailyJobDashboardProps> = ({ patients: patient
         status: job.steps.call_center === 'completed' ? 'SUCCESS' : 'IN_PROGRESS',
         insuranceProvider,
         insuranceRep: 'Amanda Rodriguez',
+        score: '98%',
+        runBy: 'Smith AI System'
+      });
+    }
+
+    // Save to PMS transaction
+    if (job.steps.save_pms !== 'pending') {
+      const saveStartTime = new Date(job.jobDate.getTime() + 61 * 60000); // 61 minutes after job start
+      transactions.push({
+        startTime: saveStartTime.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }) + ' ' +
+          `${String(saveStartTime.getHours()).padStart(2, '0')}:${String(saveStartTime.getMinutes()).padStart(2, '0')}:45`,
+        reqId: `REQ-${job.jobDate.toISOString().split('T')[0].replace(/-/g, '')}-${Math.floor((seed + 300) % 1000).toString().padStart(4, '0')}`,
+        duration: '1m 30s',
+        type: 'SAVE',
+        status: job.steps.save_pms === 'completed' ? 'SUCCESS' : 'IN_PROGRESS',
+        insuranceProvider: '-',
+        insuranceRep: '-',
         score: '100%',
         runBy: 'Smith AI System'
       });
@@ -595,11 +647,7 @@ const DailyJobDashboard: React.FC<DailyJobDashboardProps> = ({ patients: patient
                                   </td>
                                   <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">{transaction.duration}</td>
                                   <td className="px-4 py-3">
-                                    <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold ${
-                                      transaction.type === 'FAX' ? 'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400' :
-                                      transaction.type === 'API' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' :
-                                      'bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400'
-                                    }`}>
+                                    <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold ${TRANSACTION_TYPE_STYLES[transaction.type as keyof typeof TRANSACTION_TYPE_STYLES]?.bgColor} ${TRANSACTION_TYPE_STYLES[transaction.type as keyof typeof TRANSACTION_TYPE_STYLES]?.textColor}`}>
                                       {transaction.type}
                                     </span>
                                   </td>

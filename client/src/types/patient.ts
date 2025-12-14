@@ -14,10 +14,11 @@ export interface Patient {
 }
 
 export interface VerificationStatus {
-  eligibilityCheck: 'completed' | 'in_progress' | 'pending';
-  benefitsVerification: 'completed' | 'in_progress' | 'pending';
-  aiCallVerification: 'completed' | 'in_progress' | 'pending';
-  sendToPMS: 'completed' | 'in_progress' | 'pending';
+  fetchPMS: 'completed' | 'in_progress' | 'pending';
+  documentAnalysis: 'completed' | 'in_progress' | 'pending';
+  apiVerification: 'completed' | 'in_progress' | 'pending';
+  callCenter: 'completed' | 'in_progress' | 'pending';
+  saveToPMS: 'completed' | 'in_progress' | 'pending';
 }
 
 export interface PatientName {

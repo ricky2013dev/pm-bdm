@@ -12,10 +12,11 @@
     "gender": "female",
     "birthDate": "1985-03-15",
     "verificationStatus": {
-      "eligibilityCheck": "completed",
-      "benefitsVerification": "in_progress",
-      "aiCallVerification": "pending",
-      "sendToPMS": "pending"
+      "fetchPMS": "completed",
+      "documentAnalysis": "completed",
+      "apiVerification": "completed",
+      "callCenter": "completed",
+      "saveToPMS": "completed"
     },
     "telecom": [
       {
@@ -61,22 +62,22 @@
     ],
     "appointments": [
       {
-        "date": "2025-12-11",
-        "time": "5:30 PM",
+        "date": "2025-12-19",
+        "time": "12:00 PM",
         "status": "scheduled",
         "type": "Teeth Cleaning",
         "provider": "Smith"
       },
       {
-        "date": "2025-10-13",
-        "time": "12:00 PM",
+        "date": "2025-11-07",
+        "time": "7:30 PM",
         "status": "completed",
         "type": "Teeth Cleaning",
         "provider": "Johnson"
       },
       {
-        "date": "2025-08-30",
-        "time": "5:30 PM",
+        "date": "2025-10-01",
+        "time": "12:30 PM",
         "status": "completed",
         "type": "Crown Placement",
         "provider": "Smith"
@@ -161,10 +162,11 @@
     "gender": "male",
     "birthDate": "1978-07-22",
     "verificationStatus": {
-      "eligibilityCheck": "completed",
-      "benefitsVerification": "completed",
-      "aiCallVerification": "in_progress",
-      "sendToPMS": "pending"
+      "fetchPMS": "in_progress",
+      "documentAnalysis": "in_progress",
+      "apiVerification": "in_progress",
+      "callCenter": "in_progress",
+      "saveToPMS": "pending"
     },
     "telecom": [
       {
@@ -228,15 +230,15 @@
     ],
     "appointments": [
       {
-        "date": "2025-12-13",
-        "time": "3:30 PM",
+        "date": "2025-12-20",
+        "time": "5:00 PM",
         "status": "scheduled",
         "type": "Root Canal",
         "provider": "Williams"
       },
       {
-        "date": "2025-10-30",
-        "time": "10:00 AM",
+        "date": "2025-09-14",
+        "time": "4:00 PM",
         "status": "completed",
         "type": "Filling",
         "provider": "Johnson"
@@ -319,10 +321,11 @@
     "gender": "female",
     "birthDate": "1992-11-08",
     "verificationStatus": {
-      "eligibilityCheck": "in_progress",
-      "benefitsVerification": "pending",
-      "aiCallVerification": "pending",
-      "sendToPMS": "pending"
+      "fetchPMS": "pending",
+      "documentAnalysis": "pending",
+      "apiVerification": "pending",
+      "callCenter": "pending",
+      "saveToPMS": "pending"
     },
     "telecom": [
       {
@@ -367,15 +370,15 @@
     ],
     "appointments": [
       {
-        "date": "2025-12-12",
-        "time": "6:00 PM",
+        "date": "2025-12-20",
+        "time": "3:30 PM",
         "status": "scheduled",
         "type": "Dental Exam",
         "provider": "Martinez"
       },
       {
-        "date": "2025-10-13",
-        "time": "8:00 AM",
+        "date": "2025-10-31",
+        "time": "4:30 PM",
         "status": "completed",
         "type": "Regular Checkup",
         "provider": "Smith"
@@ -457,15 +460,15 @@
     "insurance": [],
     "appointments": [
       {
-        "date": "2025-12-14",
-        "time": "8:30 AM",
+        "date": "2025-12-17",
+        "time": "11:30 AM",
         "status": "scheduled",
         "type": "Extraction",
         "provider": "Dr. Williams"
       },
       {
-        "date": "2025-11-02",
-        "time": "11:30 AM",
+        "date": "2025-10-04",
+        "time": "4:00 PM",
         "status": "completed",
         "type": "Regular Checkup",
         "provider": "Smith AI System"
@@ -489,6 +492,13 @@
       "deductible": 0,
       "deductible_met": 0,
       "procedures": []
+    },
+    "verificationStatus": {
+      "fetchPMS": "completed",
+      "documentAnalysis": "completed",
+      "apiVerification": "pending",
+      "callCenter": "pending",
+      "saveToPMS": "pending"
     }
   },
   {
@@ -504,10 +514,11 @@
     "gender": "female",
     "birthDate": "1988-09-12",
     "verificationStatus": {
-      "eligibilityCheck": "completed",
-      "benefitsVerification": "completed",
-      "aiCallVerification": "completed",
-      "sendToPMS": "completed"
+      "fetchPMS": "in_progress",
+      "documentAnalysis": "in_progress",
+      "apiVerification": "completed",
+      "callCenter": "pending",
+      "saveToPMS": "pending"
     },
     "telecom": [
       {
@@ -552,15 +563,15 @@
     ],
     "appointments": [
       {
-        "date": "2025-12-14",
-        "time": "1:30 PM",
+        "date": "2025-12-17",
+        "time": "6:30 PM",
         "status": "scheduled",
         "type": "Teeth Cleaning",
         "provider": "Johnson"
       },
       {
-        "date": "2025-09-27",
-        "time": "2:00 PM",
+        "date": "2025-11-03",
+        "time": "4:00 PM",
         "status": "completed",
         "type": "Teeth Cleaning",
         "provider": "Martinez"
@@ -662,10 +673,11 @@
     "gender": "male",
     "birthDate": "1975-02-18",
     "verificationStatus": {
-      "eligibilityCheck": "pending",
-      "benefitsVerification": "pending",
-      "aiCallVerification": "pending",
-      "sendToPMS": "pending"
+      "fetchPMS": "pending",
+      "documentAnalysis": "pending",
+      "apiVerification": "in_progress",
+      "callCenter": "completed",
+      "saveToPMS": "pending"
     },
     "telecom": [
       {
@@ -710,15 +722,15 @@
     ],
     "appointments": [
       {
-        "date": "2025-12-14",
-        "time": "12:00 PM",
+        "date": "2025-12-20",
+        "time": "6:30 PM",
         "status": "scheduled",
         "type": "Crown Placement",
         "provider": "Williams"
       },
       {
-        "date": "2025-11-08",
-        "time": "8:00 AM",
+        "date": "2025-08-24",
+        "time": "11:30 AM",
         "status": "completed",
         "type": "Filling",
         "provider": "Smith"
@@ -782,10 +794,11 @@
     "gender": "female",
     "birthDate": "1995-12-25",
     "verificationStatus": {
-      "eligibilityCheck": "completed",
-      "benefitsVerification": "pending",
-      "aiCallVerification": "pending",
-      "sendToPMS": "pending"
+      "fetchPMS": "completed",
+      "documentAnalysis": "completed",
+      "apiVerification": "pending",
+      "callCenter": "in_progress",
+      "saveToPMS": "completed"
     },
     "telecom": [
       {
@@ -830,15 +843,15 @@
     ],
     "appointments": [
       {
-        "date": "2025-12-11",
-        "time": "7:00 PM",
+        "date": "2025-12-20",
+        "time": "5:30 PM",
         "status": "scheduled",
         "type": "Filling",
         "provider": "Martinez"
       },
       {
-        "date": "2025-08-19",
-        "time": "10:00 AM",
+        "date": "2025-09-08",
+        "time": "11:00 AM",
         "status": "completed",
         "type": "Regular Checkup",
         "provider": "Johnson"
@@ -894,10 +907,11 @@
     "gender": "male",
     "birthDate": "1982-04-07",
     "verificationStatus": {
-      "eligibilityCheck": "in_progress",
-      "benefitsVerification": "pending",
-      "aiCallVerification": "pending",
-      "sendToPMS": "pending"
+      "fetchPMS": "in_progress",
+      "documentAnalysis": "in_progress",
+      "apiVerification": "pending",
+      "callCenter": "pending",
+      "saveToPMS": "pending"
     },
     "telecom": [
       {
@@ -942,15 +956,15 @@
     ],
     "appointments": [
       {
-        "date": "2025-12-15",
-        "time": "3:00 PM",
+        "date": "2025-12-17",
+        "time": "5:30 PM",
         "status": "scheduled",
         "type": "Dental Exam",
         "provider": "Smith"
       },
       {
-        "date": "2025-08-22",
-        "time": "12:30 PM",
+        "date": "2025-09-04",
+        "time": "3:00 PM",
         "status": "completed",
         "type": "Teeth Cleaning",
         "provider": "Williams"
@@ -1014,10 +1028,11 @@
     "gender": "female",
     "birthDate": "1970-08-14",
     "verificationStatus": {
-      "eligibilityCheck": "completed",
-      "benefitsVerification": "in_progress",
-      "aiCallVerification": "pending",
-      "sendToPMS": "pending"
+      "fetchPMS": "pending",
+      "documentAnalysis": "pending",
+      "apiVerification": "completed",
+      "callCenter": "pending",
+      "saveToPMS": "pending"
     },
     "telecom": [
       {
@@ -1062,22 +1077,22 @@
     ],
     "appointments": [
       {
-        "date": "2025-12-13",
-        "time": "9:00 AM",
+        "date": "2025-12-20",
+        "time": "6:00 PM",
         "status": "scheduled",
         "type": "Bridge Fitting",
         "provider": "Williams"
       },
       {
-        "date": "2025-08-13",
-        "time": "6:30 PM",
+        "date": "2025-10-17",
+        "time": "12:30 PM",
         "status": "completed",
         "type": "Consultation",
         "provider": "Williams"
       },
       {
-        "date": "2025-09-13",
-        "time": "10:00 AM",
+        "date": "2025-11-04",
+        "time": "9:30 AM",
         "status": "completed",
         "type": "Regular Checkup",
         "provider": "Smith"
@@ -1154,10 +1169,11 @@
     "gender": "male",
     "birthDate": "2010-03-22",
     "verificationStatus": {
-      "eligibilityCheck": "completed",
-      "benefitsVerification": "completed",
-      "aiCallVerification": "pending",
-      "sendToPMS": "pending"
+      "fetchPMS": "completed",
+      "documentAnalysis": "completed",
+      "apiVerification": "in_progress",
+      "callCenter": "pending",
+      "saveToPMS": "pending"
     },
     "telecom": [
       {
@@ -1202,15 +1218,15 @@
     ],
     "appointments": [
       {
-        "date": "2025-12-12",
-        "time": "8:30 AM",
+        "date": "2025-12-17",
+        "time": "5:30 PM",
         "status": "scheduled",
         "type": "Dental Exam",
         "provider": "Johnson"
       },
       {
-        "date": "2025-08-23",
-        "time": "8:30 AM",
+        "date": "2025-08-21",
+        "time": "6:00 PM",
         "status": "completed",
         "type": "Sealant Application",
         "provider": "Johnson"

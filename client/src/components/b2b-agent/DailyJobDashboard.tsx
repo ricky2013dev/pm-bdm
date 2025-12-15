@@ -253,26 +253,9 @@ const DailyJobDashboard: React.FC<DailyJobDashboardProps> = ({ patients: patient
       });
     }
 
-    // Document Analysis transaction
-    if (job.steps.analysis !== 'pending') {
-      const analysisStartTime = new Date(job.jobDate.getTime() + 3 * 60000); // 3 minutes after job start
-      transactions.push({
-        startTime: analysisStartTime.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }) + ' ' +
-          `${String(analysisStartTime.getHours()).padStart(2, '0')}:${String(analysisStartTime.getMinutes()).padStart(2, '0')}:30`,
-        reqId: `REQ-${job.jobDate.toISOString().split('T')[0].replace(/-/g, '')}-${Math.floor((seed + 50) % 1000).toString().padStart(4, '0')}`,
-        duration: '5m 25s',
-        type: 'ANALYSIS',
-        status: job.steps.analysis === 'completed' ? 'SUCCESS' : 'IN_PROGRESS',
-        insuranceProvider,
-        insuranceRep: 'Document AI',
-        score: '85%',
-        runBy: 'Smith AI System'
-      });
-    }
-
     // API transaction
     if (job.steps.api_call !== 'pending') {
-      const apiStartTime = new Date(job.jobDate.getTime() + 9 * 60000); // 9 minutes after job start
+      const apiStartTime = new Date(job.jobDate.getTime() + 3 * 60000); // 3 minutes after job start
       transactions.push({
         startTime: apiStartTime.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }) + ' ' +
           `${String(apiStartTime.getHours()).padStart(2, '0')}:${String(apiStartTime.getMinutes()).padStart(2, '0')}:15`,
@@ -283,6 +266,23 @@ const DailyJobDashboard: React.FC<DailyJobDashboardProps> = ({ patients: patient
         insuranceProvider,
         insuranceRep: 'API System',
         score: '92%',
+        runBy: 'Smith AI System'
+      });
+    }
+
+    // Document Analysis transaction
+    if (job.steps.analysis !== 'pending') {
+      const analysisStartTime = new Date(job.jobDate.getTime() + 9 * 60000); // 9 minutes after job start
+      transactions.push({
+        startTime: analysisStartTime.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }) + ' ' +
+          `${String(analysisStartTime.getHours()).padStart(2, '0')}:${String(analysisStartTime.getMinutes()).padStart(2, '0')}:30`,
+        reqId: `REQ-${job.jobDate.toISOString().split('T')[0].replace(/-/g, '')}-${Math.floor((seed + 50) % 1000).toString().padStart(4, '0')}`,
+        duration: '5m 25s',
+        type: 'ANALYSIS',
+        status: job.steps.analysis === 'completed' ? 'SUCCESS' : 'IN_PROGRESS',
+        insuranceProvider,
+        insuranceRep: 'Document AI',
+        score: '85%',
         runBy: 'Smith AI System'
       });
     }

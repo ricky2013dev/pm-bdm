@@ -351,8 +351,8 @@ const DailyJobDashboard: React.FC<DailyJobDashboardProps> = ({ patients: patient
 
           {/* Title */}
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Dashboard</h1>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Track patient verification workflow progress</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">AI-Automated Jobs Dashboard </h1>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Track Patient Insurance Verification Workflow Progress</p>
           </div>
 
           {/* View Controls */}

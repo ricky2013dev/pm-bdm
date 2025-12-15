@@ -72,36 +72,9 @@ export const mockData: Transaction[] = [
       transcript: 'Fetch PMS data completed successfully. Patient information retrieved and validated.'
     }
   },
-  // FAX DOCUMENT ANALYSIS
-  {
-    id: '1',
-    requestId: 'REQ-2025-11-28-0915',
-    type: 'FAX',
-    method: 'FAX /fax/document-analysis',
-    startTime: '2025-11-28 09:15:30',
-    endTime: '2025-11-28 09:20:55',
-    duration: '5m 25s',
-    status: 'SUCCESS',
-    patientId: 'P002',
-    patientName: 'Sarah Johnson',
-    insuranceProvider: 'Cigna Dental',
-    insuranceRep: 'Fax System',
-    runBy: 'Smith AI System',
-    dataVerified: ['Member ID', 'Patient Name', 'Plan Name', 'Effective Date', 'Coverage', 'Deductible', 'Annual Maximum'],
-    verificationScore: 30,
-    fetchStatus: 'completed',
-    saveStatus: 'completed',
-    details: {
-      eligibilityCheck: 'ACTIVE - Policy effective through 12/31/2025',
-      benefitsVerification: 'Preventive: 100%, Basic: 80%, Major: 50%',
-      coverageDetails: 'Annual Maximum: $2,000 | Used: $0 | Remaining: $2,000',
-      deductibleInfo: 'Individual Deductible: $50 | Met: $0',
-      transcript: 'Fax document analysis completed successfully. Insurance information extracted and verified from fax document.'
-    }
-  },
   // API SUCCESS
   {
-    id: '2',
+    id: '1',
     requestId: 'REQ-2025-11-28-0930',
     type: 'API',
     method: 'POST /api/benefits/query',
@@ -126,6 +99,33 @@ export const mockData: Transaction[] = [
       coverageDetails: 'Annual Maximum: $2,000 | Used: $450 | Remaining: $1,550 | Plan Type: PPO Premium',
       deductibleInfo: 'Individual Deductible: $50 | Family Deductible: $150 | Deductible Met: $50',
       rawResponse: '{"verification_id":"VER-2025-001234","timestamp":"2025-01-21T10:30:45Z","patient":{"name":"Michael Robert Anderson","dob":"1978-07-22","member_id":"BCBS123456789"},"insurance":{"carrier":"Blue Cross Blue Shield","group_number":"GRP987654","policy_status":"active","effective_date":"2024-01-01","plan_type":"PPO Premium"},"eligibility":{"active":true,"coverage_status":"verified","verification_date":"2025-01-21"},"benefits":{"annual_maximum":2000,"annual_used":450,"annual_remaining":1550,"deductible":50,"deductible_met":50,"preventive_coverage":"100%","basic_coverage":"80%","major_coverage":"50%","waiting_periods":{"preventive":"none","basic":"none","major":"12 months"}}}'
+    }
+  },
+  // FAX DOCUMENT ANALYSIS
+  {
+    id: '2',
+    requestId: 'REQ-2025-11-28-0915',
+    type: 'FAX',
+    method: 'FAX /fax/document-analysis',
+    startTime: '2025-11-28 09:15:30',
+    endTime: '2025-11-28 09:20:55',
+    duration: '5m 25s',
+    status: 'SUCCESS',
+    patientId: 'P002',
+    patientName: 'Sarah Johnson',
+    insuranceProvider: 'Cigna Dental',
+    insuranceRep: 'Fax System',
+    runBy: 'Smith AI System',
+    dataVerified: ['Member ID', 'Patient Name', 'Plan Name', 'Effective Date', 'Coverage', 'Deductible', 'Annual Maximum'],
+    verificationScore: 30,
+    fetchStatus: 'completed',
+    saveStatus: 'completed',
+    details: {
+      eligibilityCheck: 'ACTIVE - Policy effective through 12/31/2025',
+      benefitsVerification: 'Preventive: 100%, Basic: 80%, Major: 50%',
+      coverageDetails: 'Annual Maximum: $2,000 | Used: $0 | Remaining: $2,000',
+      deductibleInfo: 'Individual Deductible: $50 | Met: $0',
+      transcript: 'Fax document analysis completed successfully. Insurance information extracted and verified from fax document.'
     }
   },
   // CALL SUCCESS
@@ -630,16 +630,6 @@ Important Notes
           API
         </button>
         <button
-          onClick={() => setTypeFilter('CALL')}
-          className={`px-2 py-0.5 rounded text-[10px] font-semibold transition-colors ${
-            typeFilter === 'CALL'
-              ? 'bg-purple-600 text-white'
-              : 'text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
-          }`}
-        >
-          CALL
-        </button>
-        <button
           onClick={() => setTypeFilter('FAX')}
           className={`px-2 py-0.5 rounded text-[10px] font-semibold transition-colors ${
             typeFilter === 'FAX'
@@ -648,6 +638,16 @@ Important Notes
           }`}
         >
           FAX
+        </button>
+        <button
+          onClick={() => setTypeFilter('CALL')}
+          className={`px-2 py-0.5 rounded text-[10px] font-semibold transition-colors ${
+            typeFilter === 'CALL'
+              ? 'bg-purple-600 text-white'
+              : 'text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+          }`}
+        >
+          CALL
         </button>
 
         {/* Clear Filters */}

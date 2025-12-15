@@ -93,10 +93,10 @@ const PatientDetail: React.FC<PatientDetailProps> = ({
     if (status.saveToPMS === 'in_progress') return 5;
     if (status.callCenter === 'completed') return 4;
     if (status.callCenter === 'in_progress') return 4;
-    if (status.apiVerification === 'completed') return 3;
-    if (status.apiVerification === 'in_progress') return 3;
-    if (status.documentAnalysis === 'completed') return 2;
-    if (status.documentAnalysis === 'in_progress') return 2;
+    if (status.documentAnalysis === 'completed') return 3;
+    if (status.documentAnalysis === 'in_progress') return 3;
+    if (status.apiVerification === 'completed') return 2;
+    if (status.apiVerification === 'in_progress') return 2;
     if (status.fetchPMS === 'completed') return 2;
     if (status.fetchPMS === 'in_progress') return 1;
     return 1;
@@ -383,24 +383,8 @@ const PatientDetail: React.FC<PatientDetailProps> = ({
           </div>
 
           <div className={`flex gap-2 ${patient.id.startsWith('new-') ? 'invisible' : ''}`}>
-            {/* Request Insurance Fax */}
-            <button
-              onClick={() => {
-                // Call the global openFaxModal function exposed by SmartAITransactionHistory
-                if (window.openFaxModal) {
-                  window.openFaxModal();
-                  // Also navigate to the AI Call History tab to show the modal
-                  onTabChange(TAB_TYPES.AI_CALL_HISTORY);
-                }
-              }}
-              className="ml-3 px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-medium transition-colors bg-slate-900 dark:bg-slate-800 text-white hover:bg-slate-800 dark:hover:bg-slate-700"
-              title="Request insurance fax document"
-            >
-              <span className="material-symbols-outlined text-base">description</span>
-              Run Fax Document Analysis
-            </button>
 
-            {/* Step 1: Run API Verification */}
+            {/* Run API Verification */}
             <button
               onClick={() => setIsCoverageResultsOpen(true)}
               className="ml-3 px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-medium transition-colors bg-slate-900 dark:bg-slate-800 text-white hover:bg-slate-800 dark:hover:bg-slate-700"
@@ -415,10 +399,28 @@ const PatientDetail: React.FC<PatientDetailProps> = ({
               }`}>
                 {isAPIVerificationCompleted() ? 'check_circle' : 'verified_user'}
               </span>
-              Run API Verification
+               API Verification
             </button>
 
-            {/* Step 2: Start AI Call */}
+            {/* Request Insurance Fax */}
+            <button
+              onClick={() => {
+                // Call the global openFaxModal function exposed by SmartAITransactionHistory
+                if (window.openFaxModal) {
+                  window.openFaxModal();
+                  // Also navigate to the AI Call History tab to show the modal
+                  onTabChange(TAB_TYPES.AI_CALL_HISTORY);
+                }
+              }}
+              className="ml-3 px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-medium transition-colors bg-slate-900 dark:bg-slate-800 text-white hover:bg-slate-800 dark:hover:bg-slate-700"
+              title="Request insurance fax document"
+            >
+              <span className="material-symbols-outlined text-base">description</span>
+               Fax Document
+            </button>
+
+
+            {/* Step  Start AI Call */}
             <button
               onClick={() => setShowAICenter(true)}
               className="ml-3 px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-medium transition-colors bg-slate-900 dark:bg-slate-800 text-white hover:bg-slate-800 dark:hover:bg-slate-700"
@@ -433,7 +435,7 @@ const PatientDetail: React.FC<PatientDetailProps> = ({
               }`}>
                 {isCallCenterCompleted() ? 'check_circle' : 'smart_toy'}
               </span>
-              Run AI Call Verification
+               AI Live Call
             </button>
           </div>
 
@@ -457,19 +459,19 @@ const PatientDetail: React.FC<PatientDetailProps> = ({
                   }`}
                   style={{ left: '10%', width: '18%' }}
                 ></div>
-                {/* Line 2: Document Analysis to API Verification */}
+                {/* Line 2: API Verification to Document Analysis */}
                 <div
                   className={`absolute top-4 h-0.5 transition-colors ${
-                    isDocumentAnalysisCompleted()
+                    isAPIVerificationCompleted()
                       ? 'bg-green-500'
                       : 'bg-slate-300 dark:bg-slate-600'
                   }`}
                   style={{ left: '30%', width: '18%' }}
                 ></div>
-                {/* Line 3: API Verification to Call Center */}
+                {/* Line 3: Document Analysis to Call Center */}
                 <div
                   className={`absolute top-4 h-0.5 transition-colors ${
-                    isAPIVerificationCompleted()
+                    isDocumentAnalysisCompleted()
                       ? 'bg-green-500'
                       : 'bg-slate-300 dark:bg-slate-600'
                   }`}
@@ -497,23 +499,23 @@ const PatientDetail: React.FC<PatientDetailProps> = ({
                     </p>
                   </div>
 
-                  {/* Step 2 - Document Analysis */}
-                  <div className="flex flex-col items-center" style={{ width: '20%' }}>
-                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${getStepConfig('documentAnalysis').bgColor} ${getStepConfig('documentAnalysis').textColor} shrink-0 relative z-10 border-2 border-white dark:border-slate-900`}>
-                      <span className="material-symbols-outlined text-sm">{getStepConfig('documentAnalysis').icon}</span>
-                    </div>
-                    <p className="text-[9px] text-slate-600 dark:text-slate-400 mt-1 text-center leading-tight px-0.5">
-                      {getStepConfig('documentAnalysis').label}
-                    </p>
-                  </div>
-
-                  {/* Step 3 - API Verification */}
+                  {/* Step 2 - API Verification */}
                   <div className="flex flex-col items-center" style={{ width: '20%' }}>
                     <div className={`flex items-center justify-center w-8 h-8 rounded-full ${getStepConfig('apiVerification').bgColor} ${getStepConfig('apiVerification').textColor} shrink-0 relative z-10 border-2 border-white dark:border-slate-900`}>
                       <span className="material-symbols-outlined text-sm">{getStepConfig('apiVerification').icon}</span>
                     </div>
                     <p className="text-[9px] text-slate-600 dark:text-slate-400 mt-1 text-center leading-tight px-0.5">
                       {getStepConfig('apiVerification').label}
+                    </p>
+                  </div>
+
+                  {/* Step 3 - Document Analysis */}
+                  <div className="flex flex-col items-center" style={{ width: '20%' }}>
+                    <div className={`flex items-center justify-center w-8 h-8 rounded-full ${getStepConfig('documentAnalysis').bgColor} ${getStepConfig('documentAnalysis').textColor} shrink-0 relative z-10 border-2 border-white dark:border-slate-900`}>
+                      <span className="material-symbols-outlined text-sm">{getStepConfig('documentAnalysis').icon}</span>
+                    </div>
+                    <p className="text-[9px] text-slate-600 dark:text-slate-400 mt-1 text-center leading-tight px-0.5">
+                      {getStepConfig('documentAnalysis').label}
                     </p>
                   </div>
 

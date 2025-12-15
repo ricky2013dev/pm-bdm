@@ -38,8 +38,8 @@ const DailyJobDashboard: React.FC<DailyJobDashboardProps> = ({ patients: patient
 
   const jobSteps: JobStep[] = [
     { id: 'fetch_pms', label: 'Fetch PMS', icon: 'download' },
-    { id: 'analysis', label: 'Document Analysis', icon: 'description' },
     { id: 'api_call', label: 'API Verification', icon: 'api' },
+    { id: 'analysis', label: 'Document Analysis', icon: 'description' },
     { id: 'call_center', label: 'Call Center', icon: 'phone' },
     { id: 'save_pms', label: 'Save To PMS', icon: 'save' }
   ];

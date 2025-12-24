@@ -6,10 +6,12 @@ import SmartAITransactionHistory from '@/components/b2b-agent/SmartAITransaction
 import DailyJobDashboard from '@/components/b2b-agent/DailyJobDashboard';
 import InsuranceCallDashboard from '@/components/insurance/InsuranceCallDashboard';
 import StediEligibilityChecker from '@/components/insurance/StediEligibilityChecker';
+import { StediApiProvider } from '@/context/StediApiContext';
 
 function App() {
   return (
-    <Router>
+    <StediApiProvider>
+      <Router>
       <Switch>
         <Route path="/" component={() => <HomePage />} />
         <Route path="/b2b-agent/dashboard" component={() => <DailyJobDashboard />} />
@@ -31,6 +33,7 @@ function App() {
         </Route>
       </Switch>
     </Router>
+    </StediApiProvider>
   );
 }
 

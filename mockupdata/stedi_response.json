@@ -1,0 +1,190 @@
+{
+  "success": true,
+  "data": {
+    "general": {
+      "benefits": [
+        {
+          "service": "Dental - Preventive",
+          "status": "active",
+          "percentageCovered": "100",
+          "copayAmount": "$0"
+        },
+        {
+          "service": "Dental - Basic",
+          "status": "active",
+          "percentageCovered": "80",
+          "copayAmount": "$25"
+        },
+        {
+          "service": "Dental - Major",
+          "status": "active",
+          "percentageCovered": "50",
+          "copayAmount": "$100"
+        }
+      ]
+    },
+    "procedures": [
+      {
+        "code": "D0120",
+        "description": "Periodic oral evaluation",
+        "category": "Preventive",
+        "benefit": {
+          "percentageCovered": "100"
+        }
+      },
+      {
+        "code": "D0140",
+        "description": "Limited oral evaluation",
+        "category": "Preventive",
+        "benefit": {
+          "percentageCovered": "100"
+        }
+      },
+      {
+        "code": "D0150",
+        "description": "Comprehensive oral evaluation",
+        "category": "Preventive",
+        "benefit": {
+          "percentageCovered": "100"
+        }
+      },
+      {
+        "code": "D1110",
+        "description": "Adult prophylaxis (cleaning)",
+        "category": "Preventive",
+        "benefit": {
+          "percentageCovered": "100"
+        }
+      },
+      {
+        "code": "D1120",
+        "description": "Child prophylaxis",
+        "category": "Preventive",
+        "benefit": {
+          "percentageCovered": "100"
+        }
+      },
+      {
+        "code": "D1206",
+        "description": "Topical fluoride varnish",
+        "category": "Preventive",
+        "benefit": {
+          "percentageCovered": "100"
+        }
+      },
+      {
+        "code": "D1208",
+        "description": "Topical fluoride gel",
+        "category": "Preventive",
+        "benefit": {
+          "percentageCovered": "100"
+        }
+      },
+      {
+        "code": "D1351",
+        "description": "Sealant - per tooth",
+        "category": "Preventive",
+        "benefit": {
+          "percentageCovered": "100"
+        }
+      },
+      {
+        "code": "D0210",
+        "description": "Intraoral - complete series of radiographs",
+        "category": "Radiographs",
+        "benefit": {
+          "percentageCovered": "80"
+        }
+      },
+      {
+        "code": "D0220",
+        "description": "Intraoral - periapical first film",
+        "category": "Radiographs",
+        "benefit": {
+          "percentageCovered": "80"
+        }
+      },
+      {
+        "code": "D0230",
+        "description": "Intraoral - periapical each additional film",
+        "category": "Radiographs",
+        "benefit": {
+          "percentageCovered": "80"
+        }
+      },
+      {
+        "code": "D0270",
+        "description": "Bitewing - single film",
+        "category": "Radiographs",
+        "benefit": {
+          "percentageCovered": "80"
+        }
+      },
+      {
+        "code": "D0272",
+        "description": "Bitewing - two films",
+        "category": "Radiographs",
+        "benefit": {
+          "percentageCovered": "80"
+        }
+      },
+      {
+        "code": "D0273",
+        "description": "Bitewing - three films",
+        "category": "Radiographs",
+        "benefit": {
+          "percentageCovered": "80"
+        }
+      },
+      {
+        "code": "D0274",
+        "description": "Bitewing - four films",
+        "category": "Radiographs",
+        "benefit": {
+          "percentageCovered": "80"
+        }
+      },
+      {
+        "code": "D0330",
+        "description": "Panoramic film",
+        "category": "Radiographs",
+        "benefit": {
+          "percentageCovered": "80"
+        }
+      },
+      {
+        "code": "D2140",
+        "description": "Amalgam - one surface",
+        "category": "Restorative",
+        "benefit": {
+          "percentageCovered": "80"
+        }
+      },
+      {
+        "code": "D2150",
+        "description": "Amalgam - two surfaces",
+        "category": "Restorative",
+        "benefit": {
+          "percentageCovered": "80"
+        }
+      },
+      {
+        "code": "D2160",
+        "description": "Amalgam - three surfaces",
+        "category": "Restorative",
+        "benefit": {
+          "percentageCovered": "80"
+        }
+      },
+      {
+        "code": "D2330",
+        "description": "Resin - one surface, anterior",
+        "category": "Restorative",
+        "benefit": {
+          "percentageCovered": "80"
+        }
+      }
+    ]
+  },
+  "note": "Mock data - Stedi API test case not found. Use real test credentials for production."
+}

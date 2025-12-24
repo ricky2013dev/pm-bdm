@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation } from 'wouter';
+import { useStediApi } from '@/context/StediApiContext';
 
 interface HeaderProps {
   onLogoClick?: () => void;
@@ -16,6 +17,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onLogoClick, currentUser, onLogout, onLoginClick, onInsuranceLoginClick, mode = 'b2b' }) => {
   const [, navigate] = useLocation();
+  const { isApiEnabled, toggleApi } = useStediApi();
 
   return (
     <header className="bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-700/50 px-6 py-3 shrink-0 sticky top-0 z-50">
@@ -91,6 +93,22 @@ const Header: React.FC<HeaderProps> = ({ onLogoClick, currentUser, onLogout, onL
         {/* HIPAA Compliance, User Info and Logout */}
         {onLogout ? (
           <div className="flex items-center gap-4">
+            {/* API Toggle Button */}
+            <button
+              onClick={toggleApi}
+              className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors flex items-center gap-1.5 whitespace-nowrap ${
+                isApiEnabled
+                  ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/60'
+                  : 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50'
+              }`}
+              title={isApiEnabled ? 'API Enabled - Using Stedi API' : 'API Disabled - Using mock data'}
+            >
+              <span className="material-symbols-outlined text-xs">
+                {isApiEnabled ? 'cloud_done' : 'cloud_off'}
+              </span>
+              Stedi Test {isApiEnabled ? 'On' : 'Off'}
+            </button>
+
             {/* HIPAA Compliance Notice - Hover to expand */}
             <div className="group relative">
               {/* Compact Title - Always Visible */}

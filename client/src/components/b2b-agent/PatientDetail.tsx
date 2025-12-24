@@ -1328,6 +1328,7 @@ const PatientDetail: React.FC<PatientDetailProps> = ({
         isOpen={isCoverageResultsOpen}
         onClose={() => setIsCoverageResultsOpen(false)}
         patientName={getFullName()}
+        patient={patient}
       />
 
       {/* Document Upload Modal */}

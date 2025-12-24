@@ -30,6 +30,55 @@ export interface DentalBenefitsResponse {
   error?: string;
 }
 
+// Mock Stedi response data
+const mockStediResponse: DentalBenefitsResponse = {
+  success: true,
+  data: {
+    general: {
+      benefits: [
+        {
+          service: "Dental - Preventive",
+          status: "active",
+          percentageCovered: "100",
+          copayAmount: "$0"
+        },
+        {
+          service: "Dental - Basic",
+          status: "active",
+          percentageCovered: "80",
+          copayAmount: "$25"
+        },
+        {
+          service: "Dental - Major",
+          status: "active",
+          percentageCovered: "50",
+          copayAmount: "$100"
+        }
+      ]
+    },
+    procedures: [
+      {
+        code: "D0120",
+        description: "Periodic oral evaluation",
+        category: "Preventive",
+        benefit: { percentageCovered: "100" }
+      },
+      {
+        code: "D1110",
+        description: "Adult prophylaxis (cleaning)",
+        category: "Preventive",
+        benefit: { percentageCovered: "100" }
+      },
+      {
+        code: "D2140",
+        description: "Amalgam - one surface",
+        category: "Restorative",
+        benefit: { percentageCovered: "80" }
+      }
+    ]
+  }
+};
+
 class StediService {
   private backendUrl: string;
 
@@ -66,6 +115,25 @@ class StediService {
       console.error('Error checking dental benefits:', error);
       throw error;
     }
+  }
+
+  /**
+   * Verify Stedi API connection using same endpoint as dental benefits
+   * Can use mock data or real API based on isApiEnabled flag
+   */
+  async verifyStediAPI(
+    subscriber: Subscriber,
+    provider: Provider,
+    isApiEnabled: boolean = true
+  ): Promise<DentalBenefitsResponse> {
+    // Return mock data if API is disabled
+    if (!isApiEnabled) {
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
+      return mockStediResponse;
+    }
+
+    // Reuse the same endpoint as checkDentalBenefits for real API
+    return this.checkDentalBenefits(subscriber, provider);
   }
 }
 

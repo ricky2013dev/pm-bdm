@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import VerificationDataPanel, { VerificationDataRow } from "./VerificationDataPanel";
+import stediService, { Subscriber, Provider } from "@/services/stediService";
+import { Patient } from "@/types/patient";
+import { useStediApi } from "@/context/StediApiContext";
 
 interface CoverageVerificationResultsProps {
   isOpen: boolean;
   onClose: () => void;
   patientName?: string;
+  patient?: Patient;
 }
 
 type Step = 'step1' | 'step2' | 'step3' | 'idle';
@@ -13,8 +17,10 @@ type StepStatus = 'pending' | 'in_progress' | 'completed';
 const CoverageVerificationResults: React.FC<CoverageVerificationResultsProps> = ({
   isOpen,
   onClose,
-  patientName = "Christopher James Davis"
+  patientName = "Christopher James Davis",
+  patient
 }) => {
+  const { isApiEnabled } = useStediApi();
   const [currentStep, setCurrentStep] = useState<Step>('idle');
   const [step1Status, setStep1Status] = useState<StepStatus>('pending');
   const [step2Status, setStep2Status] = useState<StepStatus>('pending');
@@ -247,29 +253,64 @@ Plan Renewal:           January 1st`;
   }, [step3Status]);
 
   const startVerification = async () => {
-    // Step 1: Get API Result
-    setCurrentStep('step1');
-    setStep1Status('in_progress');
-    await new Promise(resolve => setTimeout(resolve, 100));
-    await typeText(apiResponse, setStep1Text, 0);
-    await new Promise(resolve => setTimeout(resolve, 50));
-    setStep1Status('completed');
+    try {
+      // Step 1: Get API Result from Stedi
+      setCurrentStep('step1');
+      setStep1Status('in_progress');
+      await new Promise(resolve => setTimeout(resolve, 100));
 
-    // Step 2: Analyze and convert to code-level
-    await new Promise(resolve => setTimeout(resolve, 150));
-    setCurrentStep('step2');
-    setStep2Status('in_progress');
-    await new Promise(resolve => setTimeout(resolve, 100));
-    await typeText(codeLevelData, setStep2Text, 0);
-    await new Promise(resolve => setTimeout(resolve, 50));
-    setStep2Status('completed');
+      let apiResponseText = apiResponse;
 
-    // Step 3: Display verification results in table format
-    await new Promise(resolve => setTimeout(resolve, 150));
-    setCurrentStep('step3');
-    setStep3Status('in_progress');
-    await new Promise(resolve => setTimeout(resolve, 100));
-    setStep3Status('completed');
+      // Call Stedi API if patient data is available
+      if (patient && (patient as any).insurance && (patient as any).insurance.length > 0) {
+        try {
+          const insurance = (patient as any).insurance[0];
+          const subscriber: Subscriber = {
+            memberId: insurance.subscriberId || "0000000000",
+            firstName: patient.name.given[0] || "John",
+            lastName: patient.name.family || "Doe",
+            dateOfBirth: patient.birthDate || "05/21/1987"
+          };
+
+          const provider: Provider = {
+            npi: "1234567890",
+            organizationName: "Smith Dental Clinic"
+          };
+
+          const result = await stediService.verifyStediAPI(subscriber, provider, isApiEnabled);
+
+          if (result.success && result.data) {
+            apiResponseText = JSON.stringify(result.data, null, 2);
+          }
+        } catch (error) {
+          console.error('Error calling Stedi API:', error);
+          // Fall back to mock response on error
+        }
+      }
+
+      await typeText(apiResponseText, setStep1Text, 0);
+      await new Promise(resolve => setTimeout(resolve, 50));
+      setStep1Status('completed');
+
+      // Step 2: Analyze and convert to code-level
+      await new Promise(resolve => setTimeout(resolve, 150));
+      setCurrentStep('step2');
+      setStep2Status('in_progress');
+      await new Promise(resolve => setTimeout(resolve, 100));
+      await typeText(codeLevelData, setStep2Text, 0);
+      await new Promise(resolve => setTimeout(resolve, 50));
+      setStep2Status('completed');
+
+      // Step 3: Display verification results in table format
+      await new Promise(resolve => setTimeout(resolve, 150));
+      setCurrentStep('step3');
+      setStep3Status('in_progress');
+      await new Promise(resolve => setTimeout(resolve, 100));
+      setStep3Status('completed');
+    } catch (error) {
+      console.error('Verification error:', error);
+      setStep1Status('completed');
+    }
   };
 
   const resetModal = () => {

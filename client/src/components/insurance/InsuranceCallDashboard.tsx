@@ -161,8 +161,8 @@ const InsuranceCallDashboard: React.FC = () => {
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Time Filter Tabs and Actions */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        {/* Time Filter Tabs */}
+        <div className="mb-6">
           <div className="flex space-x-2 bg-white dark:bg-slate-800 p-1 rounded-lg shadow-sm inline-flex">
             {(['daily', 'weekly', 'monthly', 'all'] as TimeFilter[]).map((filter) => (
               <button
@@ -178,14 +178,6 @@ const InsuranceCallDashboard: React.FC = () => {
               </button>
             ))}
           </div>
-
-          <button
-            onClick={() => navigate('/insurance/stedi-eligibility')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2 shadow-sm"
-          >
-            <span className="material-symbols-outlined text-lg">verified_user</span>
-            Check Stedi Eligibility
-          </button>
         </div>
 
         {/* Stats Cards */}

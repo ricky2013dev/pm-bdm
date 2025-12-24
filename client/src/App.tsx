@@ -5,6 +5,7 @@ import PatientDetailPage from '@/components/b2b-agent/PatientDetailPage';
 import SmartAITransactionHistory from '@/components/b2b-agent/SmartAITransactionHistory';
 import DailyJobDashboard from '@/components/b2b-agent/DailyJobDashboard';
 import InsuranceCallDashboard from '@/components/insurance/InsuranceCallDashboard';
+import InsuranceCallDetail from '@/components/insurance/InsuranceCallDetail';
 import StediEligibilityChecker from '@/components/insurance/StediEligibilityChecker';
 import { StediApiProvider } from '@/context/StediApiContext';
 
@@ -19,6 +20,7 @@ function App() {
         <Route path="/b2b-agent/patient-appointments" component={() => <PatientsManagement />} />
         <Route path="/b2b-agent/smart-ai-transaction-history" component={() => <SmartAITransactionHistory />} />
         <Route path="/insurance/dashboard" component={() => <InsuranceCallDashboard />} />
+        <Route path="/insurance/call/:id" component={() => <InsuranceCallDetail />} />
         <Route path="/insurance/stedi-eligibility" component={() => <StediEligibilityChecker />} />
         <Route path="/dashboard" component={() => <DailyJobDashboard />} />
         <Route path="/patient-appointments" component={() => <PatientsManagement />} />

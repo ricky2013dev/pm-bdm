@@ -184,7 +184,7 @@ export async function registerRoutes(
         }
       ]
     },
-    procedures: dentalCodes.slice(0, 20).map((code: any) => ({
+    procedures: dentalCodes.data.procedures.slice(0, 20).map((code: any) => ({
       code: code.code,
       description: code.description,
       category: code.category,
@@ -228,7 +228,7 @@ export async function registerRoutes(
         };
 
         // 2️⃣ Loop CDT codes, skip if covered by general benefits
-        for (const item of dentalCodes) {
+        for (const item of dentalCodes.data.procedures) {
           const covered = isCoveredInGeneral(generalBenefits, item.code);
 
           let procedureBenefit = null;

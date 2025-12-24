@@ -6,11 +6,10 @@
   "scripts": {
     "dev": "NODE_ENV=development tsx server/index.ts",
     "build": "tsx script/build.ts",
-  "start": "NODE_ENV=production node dist/index.mjs",
+    "start": "NODE_ENV=production node dist/index.mjs",
     "check": "tsc",
-     "refresh-dates": "node mockupdata/generateDynamicDates.cjs",
+    "refresh-dates": "node mockupdata/generateDynamicDates.cjs",
     "db:push": "drizzle-kit push"
-    
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -45,6 +44,7 @@
     "@radix-ui/react-tooltip": "^1.2.0",
     "@tanstack/react-query": "^5.60.5",
     "@types/bcryptjs": "^2.4.6",
+    "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

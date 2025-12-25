@@ -1,0 +1,59 @@
+{
+  "courses": [
+    {
+      "id": "cna",
+      "name": "CNA (Certified Nurse Assistant)",
+      "abbr": "CNA"
+    },
+    {
+      "id": "ccma",
+      "name": "CCMA (Medical Assistant)",
+      "abbr": "CCMA"
+    },
+    {
+      "id": "pct-pca",
+      "name": "PCT/PCA (Patient Care Technician)",
+      "abbr": "PCT/PCA"
+    },
+    {
+      "id": "cpt",
+      "name": "CPT (Phlebotomy Technician)",
+      "abbr": "CPT"
+    },
+    {
+      "id": "cpht",
+      "name": "CPhT (Pharmacy Technician)",
+      "abbr": "CPhT"
+    },
+    {
+      "id": "cet",
+      "name": "CET (Certified EKG Technician)",
+      "abbr": "CET"
+    },
+    {
+      "id": "cmaa",
+      "name": "CMAA (Administrative Assistant)",
+      "abbr": "CMAA"
+    },
+    {
+      "id": "aha-bls",
+      "name": "AHA BLS (CPR)",
+      "abbr": "BLS"
+    },
+    {
+      "id": "aha-acls",
+      "name": "AHA ACLS",
+      "abbr": "ACLS"
+    },
+    {
+      "id": "aha-heartsaver",
+      "name": "AHA Heartsaver CPR AED",
+      "abbr": "Heartsaver"
+    },
+    {
+      "id": "hha",
+      "name": "HHA (Home Health Aide)",
+      "abbr": "HHA"
+    }
+  ]
+}

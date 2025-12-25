@@ -1,16 +1,21 @@
 import {
   type User,
   type InsertUser,
+  type UpdateUser,
   type Birthday,
   type InsertBirthday,
   type Student,
   type InsertStudent,
+  type LoginHistory,
+  type InsertLoginHistory,
   users,
   birthdays,
-  students
+  students,
+  loginHistory
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, like, ilike, and, gte, lte, desc, sql } from "drizzle-orm";
+import { hashPassword } from "./auth/password";
 
 export interface StudentFilters {
   name?: string;
@@ -29,6 +34,12 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  getAllUsers(): Promise<Omit<User, "password">[]>;
+  updateUser(id: string, user: UpdateUser): Promise<User | undefined>;
+  deleteUser(id: string): Promise<boolean>;
+
+  recordLoginAttempt(attempt: InsertLoginHistory): Promise<LoginHistory>;
+  getUserLoginHistory(userId: string, limit?: number): Promise<LoginHistory[]>;
 
   getAllBirthdays(): Promise<Birthday[]>;
   getBirthday(id: string): Promise<Birthday | undefined>;
@@ -58,6 +69,46 @@ export class DatabaseStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const [user] = await db.insert(users).values(insertUser).returning();
     return user;
+  }
+
+  async getAllUsers(): Promise<Omit<User, "password">[]> {
+    const allUsers = await db.select().from(users);
+    return allUsers.map(({ password, ...user }) => user);
+  }
+
+  async updateUser(id: string, updateData: UpdateUser): Promise<User | undefined> {
+    // Hash password if it's being updated
+    const dataToUpdate = { ...updateData };
+    if (dataToUpdate.password) {
+      dataToUpdate.password = await hashPassword(dataToUpdate.password);
+    }
+
+    const [updated] = await db
+      .update(users)
+      .set({ ...dataToUpdate, updatedAt: sql`CURRENT_DATE` })
+      .where(eq(users.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteUser(id: string): Promise<boolean> {
+    const result = await db.delete(users).where(eq(users.id, id)).returning();
+    return result.length > 0;
+  }
+
+  async recordLoginAttempt(attempt: InsertLoginHistory): Promise<LoginHistory> {
+    const [record] = await db.insert(loginHistory).values(attempt).returning();
+    return record;
+  }
+
+  async getUserLoginHistory(userId: string, limit: number = 50): Promise<LoginHistory[]> {
+    const history = await db
+      .select()
+      .from(loginHistory)
+      .where(eq(loginHistory.userId, userId))
+      .orderBy(desc(loginHistory.timestamp))
+      .limit(limit);
+    return history;
   }
 
   async getAllBirthdays(): Promise<Birthday[]> {

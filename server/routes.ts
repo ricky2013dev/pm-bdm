@@ -4,13 +4,20 @@ import { storage } from "./storage";
 import { insertBirthdaySchema, insertStudentSchema, students } from "@shared/schema";
 import { db } from "./db";
 import { sql, eq, gte, inArray } from "drizzle-orm";
+import { registerAuthRoutes } from "./auth/routes";
+import { registerUserRoutes } from "./users/routes";
+import { requireAuth } from "./auth/middleware";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
 
-  app.get("/api/birthdays", async (_req, res) => {
+  // Register auth routes (public)
+  registerAuthRoutes(app);
+
+  // All routes below require authentication
+  app.get("/api/birthdays", requireAuth, async (_req, res) => {
     try {
       const birthdays = await storage.getAllBirthdays();
       res.json(birthdays);
@@ -20,7 +27,7 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/birthdays/:id", async (req, res) => {
+  app.get("/api/birthdays/:id", requireAuth, async (req, res) => {
     try {
       const birthday = await storage.getBirthday(req.params.id);
       if (!birthday) {
@@ -32,7 +39,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/birthdays", async (req, res) => {
+  app.post("/api/birthdays", requireAuth, async (req, res) => {
     try {
       const parsed = insertBirthdaySchema.safeParse(req.body);
       if (!parsed.success) {
@@ -45,7 +52,7 @@ export async function registerRoutes(
     }
   });
 
-  app.put("/api/birthdays/:id", async (req, res) => {
+  app.put("/api/birthdays/:id", requireAuth, async (req, res) => {
     try {
       const parsed = insertBirthdaySchema.partial().safeParse(req.body);
       if (!parsed.success) {
@@ -61,7 +68,7 @@ export async function registerRoutes(
     }
   });
 
-  app.delete("/api/birthdays/:id", async (req, res) => {
+  app.delete("/api/birthdays/:id", requireAuth, async (req, res) => {
     try {
       const deleted = await storage.deleteBirthday(req.params.id);
       if (!deleted) {
@@ -74,7 +81,7 @@ export async function registerRoutes(
   });
 
   // Student routes
-  app.get("/api/students", async (req, res) => {
+  app.get("/api/students", requireAuth, async (req, res) => {
     try {
       const filters = {
         name: req.query.name as string,
@@ -97,7 +104,7 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/students/:id", async (req, res) => {
+  app.get("/api/students/:id", requireAuth, async (req, res) => {
     try {
       const student = await storage.getStudent(req.params.id);
       if (!student) {
@@ -109,7 +116,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/students", async (req, res) => {
+  app.post("/api/students", requireAuth, async (req, res) => {
     try {
       const parsed = insertStudentSchema.safeParse(req.body);
       if (!parsed.success) {
@@ -126,7 +133,7 @@ export async function registerRoutes(
     }
   });
 
-  app.put("/api/students/:id", async (req, res) => {
+  app.put("/api/students/:id", requireAuth, async (req, res) => {
     try {
       const parsed = insertStudentSchema.partial().safeParse(req.body);
       if (!parsed.success) {
@@ -146,7 +153,7 @@ export async function registerRoutes(
     }
   });
 
-  app.delete("/api/students/:id", async (req, res) => {
+  app.delete("/api/students/:id", requireAuth, async (req, res) => {
     try {
       const deleted = await storage.deleteStudent(req.params.id);
       if (!deleted) {
@@ -159,7 +166,7 @@ export async function registerRoutes(
   });
 
   // Dashboard stats endpoint
-  app.get("/api/dashboard/stats", async (_req, res) => {
+  app.get("/api/dashboard/stats", requireAuth, async (_req, res) => {
     try {
       // 1. Get metric counts
       const [totalCount] = await db
@@ -259,6 +266,9 @@ export async function registerRoutes(
       res.status(500).json({ error: "Failed to fetch dashboard stats" });
     }
   });
+
+  // Register user management routes (admin only)
+  registerUserRoutes(app);
 
   return httpServer;
 }

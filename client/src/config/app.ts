@@ -1,5 +1,5 @@
 export const APP_CONFIG = {
-  name: "DMS Care Training Center",
+  name: "DMS Care Center",
   shortName: "DMS SMS",
   description: "DMS Student Management System",
   fullTitle: "DMS Care Training Center - Student Management System",

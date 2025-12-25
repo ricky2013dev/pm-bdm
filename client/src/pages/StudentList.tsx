@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Student } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { Header } from "@/components/Header";
@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, Plus, ChevronDown, ChevronUp, Download, Upload, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Search, Plus, ChevronDown, ChevronUp, Download, Upload, ArrowUpDown, ArrowUp, ArrowDown, Filter } from "lucide-react";
 import { courses } from "@/data/courses";
 
 const statusColors = {
@@ -39,9 +39,34 @@ const statusColors = {
 type SortColumn = "name" | "email" | "phone" | "courseInterested" | "location" | "status" | "registrationDate";
 type SortDirection = "asc" | "desc" | null;
 
+// Helper function to highlight matching text
+const highlightMatch = (text: string, searchTerm: string) => {
+  if (!searchTerm || !text) return text;
+
+  const regex = new RegExp(`(${searchTerm})`, 'gi');
+  const parts = text.split(regex);
+
+  return parts.map((part, index) => {
+    if (part.toLowerCase() === searchTerm.toLowerCase()) {
+      return (
+        <span key={index} className="bg-yellow-300 dark:bg-yellow-600 font-semibold">
+          {part}
+        </span>
+      );
+    }
+    return part;
+  });
+};
+
 export default function StudentList() {
   const { toast } = useToast();
+  const [location] = useLocation();
+
+  // Initialize state from sessionStorage if available
+  const [initialized, setInitialized] = useState(false);
   const [searchName, setSearchName] = useState("");
+  const [searchEmail, setSearchEmail] = useState("");
+  const [searchPhone, setSearchPhone] = useState("");
   const [filterCourse, setFilterCourse] = useState("");
   const [filterLocation, setFilterLocation] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
@@ -52,10 +77,64 @@ export default function StudentList() {
   const [sortColumn, setSortColumn] = useState<SortColumn | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [limit, setLimit] = useState(300);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+  // Restore state from sessionStorage on mount
+  useEffect(() => {
+    const savedState = sessionStorage.getItem('studentListState');
+    if (savedState) {
+      try {
+        const state = JSON.parse(savedState);
+        setSearchName(state.searchName || "");
+        setSearchEmail(state.searchEmail || "");
+        setSearchPhone(state.searchPhone || "");
+        setFilterCourse(state.filterCourse || "");
+        setFilterLocation(state.filterLocation || "");
+        setFilterStatus(state.filterStatus || "");
+        setDateFrom(state.dateFrom || "");
+        setDateTo(state.dateTo || "");
+        setOffset(state.offset || 0);
+        setLimit(state.limit || 300);
+        setSortColumn(state.sortColumn || null);
+        setSortDirection(state.sortDirection || null);
+
+        // Restore expanded row
+        if (state.expandedStudentId) {
+          setExpandedRows(new Set([state.expandedStudentId]));
+        }
+      } catch (e) {
+        console.error('Failed to restore state:', e);
+      }
+    }
+    setInitialized(true);
+  }, []);
+
+  // Save state to sessionStorage whenever it changes
+  useEffect(() => {
+    if (!initialized) return;
+
+    const state = {
+      searchName,
+      searchEmail,
+      searchPhone,
+      filterCourse,
+      filterLocation,
+      filterStatus,
+      dateFrom,
+      dateTo,
+      offset,
+      limit,
+      sortColumn,
+      sortDirection,
+    };
+    sessionStorage.setItem('studentListState', JSON.stringify(state));
+  }, [initialized, searchName, searchEmail, searchPhone, filterCourse, filterLocation, filterStatus, dateFrom, dateTo, offset, limit, sortColumn, sortDirection]);
 
   const buildQueryString = () => {
     const params = new URLSearchParams();
     if (searchName) params.append("name", searchName);
+    if (searchEmail) params.append("email", searchEmail);
+    if (searchPhone) params.append("phone", searchPhone);
     if (filterCourse) params.append("courseInterested", filterCourse);
     if (filterLocation) params.append("location", filterLocation);
     if (filterStatus) params.append("status", filterStatus);
@@ -67,7 +146,7 @@ export default function StudentList() {
   };
 
   const { data, isLoading } = useQuery<{ students: Student[]; total: number }>({
-    queryKey: ["/api/students", searchName, filterCourse, filterLocation, filterStatus, dateFrom, dateTo, offset, limit],
+    queryKey: ["/api/students", searchName, searchEmail, searchPhone, filterCourse, filterLocation, filterStatus, dateFrom, dateTo, offset, limit],
     queryFn: async () => {
       const res = await fetch(`/api/students?${buildQueryString()}`);
       if (!res.ok) throw new Error("Failed to fetch students");
@@ -118,6 +197,13 @@ export default function StudentList() {
     setExpandedRows(newExpanded);
   };
 
+  const handleStudentClick = (studentId: string) => {
+    // Save the student ID to restore expanded state when returning
+    const currentState = JSON.parse(sessionStorage.getItem('studentListState') || '{}');
+    currentState.expandedStudentId = studentId;
+    sessionStorage.setItem('studentListState', JSON.stringify(currentState));
+  };
+
   const getSortIcon = (column: SortColumn) => {
     if (sortColumn !== column) {
       return <ArrowUpDown className="ml-2 h-4 w-4 inline" />;
@@ -130,6 +216,8 @@ export default function StudentList() {
 
   const handleClearFilters = () => {
     setSearchName("");
+    setSearchEmail("");
+    setSearchPhone("");
     setFilterCourse("");
     setFilterLocation("");
     setFilterStatus("");
@@ -138,7 +226,7 @@ export default function StudentList() {
     setOffset(0);
   };
 
-  const hasFilters = searchName || filterCourse || filterLocation || filterStatus || dateFrom || dateTo;
+  const hasFilters = searchName || searchEmail || searchPhone || filterCourse || filterLocation || filterStatus || dateFrom || dateTo;
 
   const handleExportCSV = async () => {
     try {
@@ -182,9 +270,31 @@ export default function StudentList() {
 
       <main className="w-[90%] mx-auto px-4 md:px-6 py-6 flex-1">
         <Card className="mb-6">
+          <CardHeader className="pb-3 md:hidden">
+            <Button
+              variant="outline"
+              onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+              className="w-full flex items-center justify-between"
+            >
+              <span className="flex items-center gap-2">
+                <Filter className="w-4 h-4" />
+                Filters
+                {hasFilters && (
+                  <Badge variant="secondary" className="ml-2">
+                    Active
+                  </Badge>
+                )}
+              </span>
+              {isFiltersOpen ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+            </Button>
+          </CardHeader>
 
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <CardContent className={`space-y-4 ${!isFiltersOpen ? 'hidden md:block' : ''}`}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Name</label>
                 <div className="relative">
@@ -194,6 +304,38 @@ export default function StudentList() {
                     value={searchName}
                     onChange={(e) => {
                       setSearchName(e.target.value);
+                      setOffset(0);
+                    }}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Email</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by email..."
+                    value={searchEmail}
+                    onChange={(e) => {
+                      setSearchEmail(e.target.value);
+                      setOffset(0);
+                    }}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Phone</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by phone..."
+                    value={searchPhone}
+                    onChange={(e) => {
+                      setSearchPhone(e.target.value);
                       setOffset(0);
                     }}
                     className="pl-9"
@@ -330,25 +472,24 @@ export default function StudentList() {
                   {sortedStudents.map((student) => (
                     <Card key={student.id}>
                       <CardHeader className="pb-2">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <Link href={`/students/${student.id}`}>
-                              <span className="font-bold text-lg hover:underline cursor-pointer">
-                                {student.name}
-                              </span>
-                            </Link>
-                            <div className="text-sm text-muted-foreground">{student.email}</div>
+                        <div>
+                          <Link href={`/students/${student.id}`} onClick={() => handleStudentClick(student.id)}>
+                            <span className="font-bold text-lg hover:underline cursor-pointer">
+                              {highlightMatch(student.name, searchName)}
+                            </span>
+                          </Link>
+                          <div className="text-sm text-muted-foreground">
+                            {highlightMatch(student.email, searchEmail)}
                           </div>
-                          <Badge className={statusColors[student.status as keyof typeof statusColors]}>
-                            {student.status}
-                          </Badge>
                         </div>
                       </CardHeader>
                       <CardContent className="text-sm space-y-2">
                         <div className="grid grid-cols-2 gap-2">
                           <div>
                             <span className="font-medium">Phone:</span>
-                            <div className="text-muted-foreground">{student.phone}</div>
+                            <div className="text-muted-foreground">
+                              {highlightMatch(student.phone, searchPhone)}
+                            </div>
                           </div>
                           <div>
                             <span className="font-medium">Course:</span>
@@ -363,10 +504,13 @@ export default function StudentList() {
                             <div className="text-muted-foreground">{student.registrationDate}</div>
                           </div>
                         </div>
-                        <div className="pt-2">
-                          <Link href={`/students/${student.id}`}>
+                        <div className="pt-2 flex gap-2 items-center">
+                          <Link href={`/students/${student.id}`} className="flex-1" onClick={() => handleStudentClick(student.id)}>
                             <Button variant="outline" size="sm" className="w-full">View Details</Button>
                           </Link>
+                          <Badge className={`${statusColors[student.status as keyof typeof statusColors]} shrink-0 px-2 py-1 text-xs`}>
+                            {student.status}
+                          </Badge>
                         </div>
                       </CardContent>
                     </Card>
@@ -380,6 +524,7 @@ export default function StudentList() {
                       <thead className="sticky top-0 bg-background [&_tr]:border-b">
                         <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                           <TableHead className="w-[50px]"></TableHead>
+                          <TableHead className="w-[60px]">#</TableHead>
                           <TableHead
                             className="cursor-pointer select-none hover:bg-muted/50"
                             onClick={() => handleSort("name")}
@@ -425,7 +570,7 @@ export default function StudentList() {
                         </tr>
                       </thead>
                       <tbody className="[&_tr:last-child]:border-0">
-                        {sortedStudents.map((student) => (
+                        {sortedStudents.map((student, index) => (
                           <React.Fragment key={student.id}>
                             <TableRow
                               className="cursor-pointer hover:bg-muted/50"
@@ -438,18 +583,26 @@ export default function StudentList() {
                                   <ChevronDown className="w-4 h-4" />
                                 )}
                               </TableCell>
+                              <TableCell className="text-muted-foreground">{offset + index + 1}</TableCell>
                               <TableCell className="font-bold">
                                 <Link href={`/students/${student.id}`}>
                                   <span
                                     className="hover:underline"
-                                    onClick={(e) => e.stopPropagation()}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleStudentClick(student.id);
+                                    }}
                                   >
-                                    {student.name}
+                                    {highlightMatch(student.name, searchName)}
                                   </span>
                                 </Link>
                               </TableCell>
-                              <TableCell className="hidden md:table-cell font-bold">{student.email}</TableCell>
-                              <TableCell className="hidden lg:table-cell">{student.phone}</TableCell>
+                              <TableCell className="hidden md:table-cell font-bold">
+                                {highlightMatch(student.email, searchEmail)}
+                              </TableCell>
+                              <TableCell className="hidden lg:table-cell">
+                                {highlightMatch(student.phone, searchPhone)}
+                              </TableCell>
                               <TableCell className="hidden lg:table-cell">{student.courseInterested || "N/A"}</TableCell>
                               <TableCell className="hidden xl:table-cell">{student.location || "N/A"}</TableCell>
                               <TableCell>
@@ -461,16 +614,35 @@ export default function StudentList() {
                             </TableRow>
                             {expandedRows.has(student.id) && (
                               <TableRow>
-                                <TableCell colSpan={8} className="bg-muted/20">
+                                <TableCell colSpan={9} className="bg-muted/20">
                                   <div className="py-4 space-y-2">
+                                    <div className="flex justify-end gap-2 mb-4">
+                                      <Link href={`/students/${student.id}`} onClick={() => handleStudentClick(student.id)}>
+                                        <Button variant="outline" size="sm">View Full Details</Button>
+                                      </Link>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          toggleRow(student.id);
+                                        }}
+                                      >
+                                        Close
+                                      </Button>
+                                    </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                       <div>
                                         <p className="text-sm font-medium">Email</p>
-                                        <p className="text-sm text-muted-foreground">{student.email}</p>
+                                        <p className="text-sm text-muted-foreground">
+                                          {highlightMatch(student.email, searchEmail)}
+                                        </p>
                                       </div>
                                       <div>
                                         <p className="text-sm font-medium">Phone</p>
-                                        <p className="text-sm text-muted-foreground">{student.phone}</p>
+                                        <p className="text-sm text-muted-foreground">
+                                          {highlightMatch(student.phone, searchPhone)}
+                                        </p>
                                       </div>
                                       <div>
                                         <p className="text-sm font-medium">Course Interested</p>
@@ -488,11 +660,6 @@ export default function StudentList() {
                                         <p className="text-sm font-medium">Current Situation</p>
                                         <p className="text-sm text-muted-foreground">{student.currentSituation || "N/A"}</p>
                                       </div>
-                                    </div>
-                                    <div className="pt-2">
-                                      <Link href={`/students/${student.id}`}>
-                                        <Button size="sm">View Full Details</Button>
-                                      </Link>
                                     </div>
                                   </div>
                                 </TableCell>

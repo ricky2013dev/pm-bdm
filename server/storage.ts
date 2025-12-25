@@ -10,10 +10,12 @@ import {
   students
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, like, and, gte, lte, desc, sql } from "drizzle-orm";
+import { eq, like, ilike, and, gte, lte, desc, sql } from "drizzle-orm";
 
 export interface StudentFilters {
   name?: string;
+  email?: string;
+  phone?: string;
   courseInterested?: string;
   location?: string;
   status?: string;
@@ -91,7 +93,13 @@ export class DatabaseStorage implements IStorage {
     const conditions = [];
 
     if (filters?.name) {
-      conditions.push(like(students.name, `%${filters.name}%`));
+      conditions.push(ilike(students.name, `%${filters.name}%`));
+    }
+    if (filters?.email) {
+      conditions.push(ilike(students.email, `%${filters.email}%`));
+    }
+    if (filters?.phone) {
+      conditions.push(ilike(students.phone, `%${filters.phone}%`));
     }
     if (filters?.courseInterested) {
       conditions.push(eq(students.courseInterested, filters.courseInterested));

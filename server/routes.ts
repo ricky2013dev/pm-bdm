@@ -1,7 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertBirthdaySchema, insertStudentSchema } from "@shared/schema";
+import { insertBirthdaySchema, insertStudentSchema, students } from "@shared/schema";
+import { db } from "./db";
+import { sql, eq, gte, inArray } from "drizzle-orm";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -76,6 +78,8 @@ export async function registerRoutes(
     try {
       const filters = {
         name: req.query.name as string,
+        email: req.query.email as string,
+        phone: req.query.phone as string,
         courseInterested: req.query.courseInterested as string,
         location: req.query.location as string,
         status: req.query.status as string,
@@ -151,6 +155,108 @@ export async function registerRoutes(
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ error: "Failed to delete student" });
+    }
+  });
+
+  // Dashboard stats endpoint
+  app.get("/api/dashboard/stats", async (_req, res) => {
+    try {
+      // 1. Get metric counts
+      const [totalCount] = await db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(students);
+
+      const [activeCount] = await db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(students)
+        .where(inArray(students.status, ['active', 'enrolled']));
+
+      const [graduatedCount] = await db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(students)
+        .where(eq(students.status, 'graduated'));
+
+      // Get current month's first day
+      const firstDayOfMonth = new Date();
+      firstDayOfMonth.setDate(1);
+      firstDayOfMonth.setHours(0, 0, 0, 0);
+      const formattedDate = firstDayOfMonth.toISOString().split('T')[0];
+
+      const [newThisMonth] = await db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(students)
+        .where(gte(students.registrationDate, formattedDate));
+
+      // 2. Course distribution
+      const courseDistribution = await db
+        .select({
+          course: students.courseInterested,
+          count: sql<number>`count(*)::int`
+        })
+        .from(students)
+        .where(sql`course_interested IS NOT NULL`)
+        .groupBy(students.courseInterested)
+        .orderBy(sql`count(*) DESC`);
+
+      // 3. Location distribution
+      const locationDistribution = await db
+        .select({
+          location: students.location,
+          count: sql<number>`count(*)::int`
+        })
+        .from(students)
+        .where(sql`location IS NOT NULL`)
+        .groupBy(students.location);
+
+      // 4. Monthly trends (last 12 months)
+      const monthlyTrends = await db
+        .select({
+          period: sql<string>`TO_CHAR(registration_date, 'YYYY-MM')`,
+          count: sql<number>`count(*)::int`
+        })
+        .from(students)
+        .where(sql`registration_date >= CURRENT_DATE - INTERVAL '12 months'`)
+        .groupBy(sql`TO_CHAR(registration_date, 'YYYY-MM')`)
+        .orderBy(sql`TO_CHAR(registration_date, 'YYYY-MM')`);
+
+      // 5. Weekly trends (last 12 weeks)
+      const weeklyTrends = await db
+        .select({
+          period: sql<string>`TO_CHAR(registration_date, 'IYYY-IW')`,
+          count: sql<number>`count(*)::int`
+        })
+        .from(students)
+        .where(sql`registration_date >= CURRENT_DATE - INTERVAL '12 weeks'`)
+        .groupBy(sql`TO_CHAR(registration_date, 'IYYY-IW')`)
+        .orderBy(sql`TO_CHAR(registration_date, 'IYYY-IW')`);
+
+      res.json({
+        metrics: {
+          total: Number(totalCount?.count || 0),
+          active: Number(activeCount?.count || 0),
+          graduated: Number(graduatedCount?.count || 0),
+          newThisMonth: Number(newThisMonth?.count || 0)
+        },
+        courseDistribution: courseDistribution.map(c => ({
+          course: c.course || 'Unknown',
+          count: Number(c.count)
+        })),
+        locationDistribution: locationDistribution.map(l => ({
+          location: l.location || 'Unknown',
+          count: Number(l.count)
+        })),
+        monthlyTrends: monthlyTrends.map(m => ({
+          period: m.period || '',
+          count: Number(m.count)
+        })),
+        weeklyTrends: weeklyTrends.map(w => ({
+          period: w.period || '',
+          count: Number(w.count)
+        }))
+      });
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      res.status(500).json({ error: "Failed to fetch dashboard stats" });
     }
   });
 

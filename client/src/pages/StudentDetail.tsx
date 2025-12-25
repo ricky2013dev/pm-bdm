@@ -100,7 +100,7 @@ export default function StudentDetail() {
     },
     onSuccess: () => {
       toast({ title: "Student deleted successfully" });
-      setLocation("/");
+      setLocation("/students");
     },
     onError: () => {
       toast({ title: "Failed to delete student", variant: "destructive" });
@@ -147,7 +147,7 @@ export default function StudentDetail() {
       <div className="min-h-screen bg-background flex flex-col">
         <Header />
         <main className="w-[90%] mx-auto px-4 md:px-6 py-6 flex-1">
-          <Button variant="ghost" onClick={() => setLocation("/")} className="mb-4">
+          <Button variant="ghost" onClick={() => setLocation("/students")} className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Students
           </Button>
@@ -168,7 +168,7 @@ export default function StudentDetail() {
       <main className="w-[90%] mx-auto px-4 md:px-6 py-6 flex-1">
         <div className="w-full mb-4">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <Button variant="ghost" onClick={() => setLocation("/")} className="pl-0 md:pl-4">
+            <Button variant="ghost" onClick={() => setLocation("/students")} className="pl-0 md:pl-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
               <span className="md:hidden">Back</span>
               <span className="hidden md:inline">Back to Students</span>

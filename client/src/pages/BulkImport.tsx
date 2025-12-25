@@ -126,7 +126,7 @@ export default function BulkImport() {
         description: `Successfully imported ${data.succeeded} students. ${data.failed} failed.`,
       });
       if (data.succeeded > 0) {
-        setTimeout(() => setLocation("/"), 1500);
+        setTimeout(() => setLocation("/students"), 1500);
       }
     },
     onError: (error: Error) => {
@@ -163,7 +163,7 @@ export default function BulkImport() {
       <Header />
 
       <main className="w-[90%] mx-auto px-4 md:px-6 py-6 space-y-6 flex-1">
-        <Button variant="ghost" onClick={() => setLocation("/")} className="mb-4">
+        <Button variant="ghost" onClick={() => setLocation("/students")} className="mb-4">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Students
         </Button>

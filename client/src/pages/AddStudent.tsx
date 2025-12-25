@@ -81,7 +81,7 @@ export default function AddStudent() {
       <Header />
 
       <main className="w-[90%] mx-auto px-4 md:px-6 py-6 flex-1">
-        <Button variant="ghost" onClick={() => setLocation("/")} className="mb-4">
+        <Button variant="ghost" onClick={() => setLocation("/students")} className="mb-4">
           <ArrowLeft className="w-4 h-4 mr-2" />
           <span className="md:hidden">Back</span>
           <span className="hidden md:inline">Back to Students</span>

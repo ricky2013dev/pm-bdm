@@ -324,9 +324,9 @@ export default function StudentList() {
             ) : (
               <>
                 <div className="rounded-md border">
-                  <div className="w-full overflow-x-auto">
+                  <div className="w-full overflow-y-scroll max-h-[500px]">
                     <table className="w-full caption-bottom text-sm table-fixed">
-                      <thead className="[&_tr]:border-b">
+                      <thead className="sticky top-0 bg-background [&_tr]:border-b">
                         <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                           <TableHead className="w-[50px]"></TableHead>
                           <TableHead
@@ -373,10 +373,6 @@ export default function StudentList() {
                           </TableHead>
                         </tr>
                       </thead>
-                    </table>
-                  </div>
-                  <div className="w-full overflow-auto max-h-[500px]">
-                    <table className="w-full caption-bottom text-sm table-fixed">
                     <tbody className="[&_tr:last-child]:border-0">
                       {sortedStudents.map((student) => (
                         <React.Fragment key={student.id}>

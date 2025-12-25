@@ -278,7 +278,8 @@ export default function StudentList() {
 
             {hasFilters && (
               <Button variant="outline" onClick={handleClearFilters} className="w-full md:w-auto">
-                Clear All Filters
+                <span className="md:hidden">Clear</span>
+                <span className="hidden md:inline">Clear All Filters</span>
               </Button>
             )}
           </CardContent>
@@ -288,9 +289,9 @@ export default function StudentList() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                
+
                 <CardDescription>
-                  Showing {sortedStudents.length} of {total} students
+                   {sortedStudents.length} of {total} 
                 </CardDescription>
               </div>
               <div className="flex gap-2">
@@ -300,7 +301,8 @@ export default function StudentList() {
                 </Button>
                 <Button onClick={() => window.location.href = '/students/new'}>
                   <Plus className="w-4 h-4 mr-2" />
-                  Add Student
+                  <span className="md:hidden">Add</span>
+                  <span className="hidden md:inline">Add Student</span>
                 </Button>
               </div>
             </div>
@@ -323,7 +325,56 @@ export default function StudentList() {
               </div>
             ) : (
               <>
-                <div className="rounded-md border">
+                {/* Mobile View: Cards */}
+                <div className="space-y-4 md:hidden">
+                  {sortedStudents.map((student) => (
+                    <Card key={student.id}>
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <Link href={`/students/${student.id}`}>
+                              <span className="font-bold text-lg hover:underline cursor-pointer">
+                                {student.name}
+                              </span>
+                            </Link>
+                            <div className="text-sm text-muted-foreground">{student.email}</div>
+                          </div>
+                          <Badge className={statusColors[student.status as keyof typeof statusColors]}>
+                            {student.status}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="text-sm space-y-2">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <span className="font-medium">Phone:</span>
+                            <div className="text-muted-foreground">{student.phone}</div>
+                          </div>
+                          <div>
+                            <span className="font-medium">Course:</span>
+                            <div className="text-muted-foreground">{student.courseInterested || "N/A"}</div>
+                          </div>
+                          <div>
+                            <span className="font-medium">Location:</span>
+                            <div className="text-muted-foreground">{student.location || "N/A"}</div>
+                          </div>
+                          <div>
+                            <span className="font-medium">Reg. Date:</span>
+                            <div className="text-muted-foreground">{student.registrationDate}</div>
+                          </div>
+                        </div>
+                        <div className="pt-2">
+                          <Link href={`/students/${student.id}`}>
+                            <Button variant="outline" size="sm" className="w-full">View Details</Button>
+                          </Link>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Desktop View: Table */}
+                <div className="rounded-md border hidden md:block">
                   <div className="w-full overflow-y-scroll max-h-[500px]">
                     <table className="w-full caption-bottom text-sm table-fixed">
                       <thead className="sticky top-0 bg-background [&_tr]:border-b">
@@ -373,83 +424,83 @@ export default function StudentList() {
                           </TableHead>
                         </tr>
                       </thead>
-                    <tbody className="[&_tr:last-child]:border-0">
-                      {sortedStudents.map((student) => (
-                        <React.Fragment key={student.id}>
-                          <TableRow
-                            className="cursor-pointer hover:bg-muted/50"
-                            onClick={() => toggleRow(student.id)}
-                          >
-                            <TableCell>
-                              {expandedRows.has(student.id) ? (
-                                <ChevronUp className="w-4 h-4" />
-                              ) : (
-                                <ChevronDown className="w-4 h-4" />
-                              )}
-                            </TableCell>
-                            <TableCell className="font-bold">
-                              <Link href={`/students/${student.id}`}>
-                                <span
-                                  className="hover:underline"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  {student.name}
-                                </span>
-                              </Link>
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell font-bold">{student.email}</TableCell>
-                            <TableCell className="hidden lg:table-cell">{student.phone}</TableCell>
-                            <TableCell className="hidden lg:table-cell">{student.courseInterested || "N/A"}</TableCell>
-                            <TableCell className="hidden xl:table-cell">{student.location || "N/A"}</TableCell>
-                            <TableCell>
-                              <Badge className={statusColors[student.status as keyof typeof statusColors]}>
-                                {student.status}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">{student.registrationDate}</TableCell>
-                          </TableRow>
-                          {expandedRows.has(student.id) && (
-                            <TableRow>
-                              <TableCell colSpan={8} className="bg-muted/20">
-                                <div className="py-4 space-y-2">
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                      <p className="text-sm font-medium">Email</p>
-                                      <p className="text-sm text-muted-foreground">{student.email}</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-sm font-medium">Phone</p>
-                                      <p className="text-sm text-muted-foreground">{student.phone}</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-sm font-medium">Course Interested</p>
-                                      <p className="text-sm text-muted-foreground">{student.courseInterested || "N/A"}</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-sm font-medium">Location</p>
-                                      <p className="text-sm text-muted-foreground">{student.location || "N/A"}</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-sm font-medium">Citizenship Status</p>
-                                      <p className="text-sm text-muted-foreground">{student.citizenshipStatus || "N/A"}</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-sm font-medium">Current Situation</p>
-                                      <p className="text-sm text-muted-foreground">{student.currentSituation || "N/A"}</p>
-                                    </div>
-                                  </div>
-                                  <div className="pt-2">
-                                    <Link href={`/students/${student.id}`}>
-                                      <Button size="sm">View Full Details</Button>
-                                    </Link>
-                                  </div>
-                                </div>
+                      <tbody className="[&_tr:last-child]:border-0">
+                        {sortedStudents.map((student) => (
+                          <React.Fragment key={student.id}>
+                            <TableRow
+                              className="cursor-pointer hover:bg-muted/50"
+                              onClick={() => toggleRow(student.id)}
+                            >
+                              <TableCell>
+                                {expandedRows.has(student.id) ? (
+                                  <ChevronUp className="w-4 h-4" />
+                                ) : (
+                                  <ChevronDown className="w-4 h-4" />
+                                )}
                               </TableCell>
+                              <TableCell className="font-bold">
+                                <Link href={`/students/${student.id}`}>
+                                  <span
+                                    className="hover:underline"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    {student.name}
+                                  </span>
+                                </Link>
+                              </TableCell>
+                              <TableCell className="hidden md:table-cell font-bold">{student.email}</TableCell>
+                              <TableCell className="hidden lg:table-cell">{student.phone}</TableCell>
+                              <TableCell className="hidden lg:table-cell">{student.courseInterested || "N/A"}</TableCell>
+                              <TableCell className="hidden xl:table-cell">{student.location || "N/A"}</TableCell>
+                              <TableCell>
+                                <Badge className={statusColors[student.status as keyof typeof statusColors]}>
+                                  {student.status}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="hidden md:table-cell">{student.registrationDate}</TableCell>
                             </TableRow>
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </tbody>
+                            {expandedRows.has(student.id) && (
+                              <TableRow>
+                                <TableCell colSpan={8} className="bg-muted/20">
+                                  <div className="py-4 space-y-2">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                      <div>
+                                        <p className="text-sm font-medium">Email</p>
+                                        <p className="text-sm text-muted-foreground">{student.email}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-medium">Phone</p>
+                                        <p className="text-sm text-muted-foreground">{student.phone}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-medium">Course Interested</p>
+                                        <p className="text-sm text-muted-foreground">{student.courseInterested || "N/A"}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-medium">Location</p>
+                                        <p className="text-sm text-muted-foreground">{student.location || "N/A"}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-medium">Citizenship Status</p>
+                                        <p className="text-sm text-muted-foreground">{student.citizenshipStatus || "N/A"}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-medium">Current Situation</p>
+                                        <p className="text-sm text-muted-foreground">{student.currentSituation || "N/A"}</p>
+                                      </div>
+                                    </div>
+                                    <div className="pt-2">
+                                      <Link href={`/students/${student.id}`}>
+                                        <Button size="sm">View Full Details</Button>
+                                      </Link>
+                                    </div>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            )}
+                          </React.Fragment>
+                        ))}
+                      </tbody>
                     </table>
                   </div>
                 </div>

@@ -83,18 +83,20 @@ export default function AddStudent() {
       <main className="w-[90%] mx-auto px-4 md:px-6 py-6 flex-1">
         <Button variant="ghost" onClick={() => setLocation("/")} className="mb-4">
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Students
+          <span className="md:hidden">Back</span>
+          <span className="hidden md:inline">Back to Students</span>
         </Button>
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
                 <CardTitle className="text-2xl">Add New Student</CardTitle>
                 <CardDescription>Enter student information below. Fields marked with * are required.</CardDescription>
               </div>
-              <Button variant="outline" onClick={() => setLocation("/students/import")}>
+              <Button variant="outline" onClick={() => setLocation("/students/import")} className="w-full md:w-auto">
                 <Upload className="w-4 h-4 mr-2" />
-                Bulk Import
+                <span className="md:hidden">Import</span>
+                <span className="hidden md:inline">Bulk Import</span>
               </Button>
             </div>
           </CardHeader>

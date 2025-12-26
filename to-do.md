@@ -6,4 +6,4 @@
 
 I can see you want to implement the "Add Note" feature for the student details page. This feature should allow users to add, view, edit, and delete notes associated with students, with timestamps and user information. Let me explore your codebase to understand the current structure and then create an implementation plan.
 
-# Add History 
+# Add Status History 

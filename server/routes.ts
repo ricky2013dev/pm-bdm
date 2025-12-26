@@ -219,11 +219,19 @@ export async function registerRoutes(
     }
   });
 
+  // Helper to convert string boolean to actual boolean
+  const normalizeNotes = (notes: any[]) => {
+    return notes.map(note => ({
+      ...note,
+      isSystemGenerated: note.isSystemGenerated === "true",
+    }));
+  };
+
   // Student notes routes
   app.get("/api/students/:studentId/notes", requireAuth, async (req, res) => {
     try {
       const notes = await storage.getStudentNotes(req.params.studentId);
-      res.json(notes);
+      res.json(normalizeNotes(notes));
     } catch (error) {
       console.error("Error fetching student notes:", error);
       res.status(500).json({ error: "Failed to fetch notes" });

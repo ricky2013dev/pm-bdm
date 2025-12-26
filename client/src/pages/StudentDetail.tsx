@@ -71,7 +71,7 @@ export default function StudentDetail() {
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [formData, setFormData] = useState<Partial<Student>>({});
-  const [activeTab, setActiveTab] = useState<"details" | "notes">("details");
+  const [activeTab, setActiveTab] = useState<"details" | "notes" | "log">("details");
   const [isAddNoteOpen, setIsAddNoteOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<StudentNote | null>(null);
   const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null);
@@ -138,6 +138,10 @@ export default function StudentDetail() {
     },
     enabled: !!studentId,
   });
+
+  // Filter notes into user notes and system logs
+  const userNotes = notes.filter(note => !note.isSystemGenerated);
+  const systemLogs = notes.filter(note => note.isSystemGenerated);
 
   const createNoteMutation = useMutation({
     mutationFn: async (content: string) => {
@@ -333,10 +337,11 @@ export default function StudentDetail() {
             </div>
           </CardHeader>
           <CardContent>
-            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "details" | "notes")}>
-              <TabsList className="grid w-full grid-cols-2">
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "details" | "notes" | "log")}>
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="details">Details</TabsTrigger>
-                <TabsTrigger value="notes">Notes ({notes.length})</TabsTrigger>
+                <TabsTrigger value="notes">Notes ({userNotes.length})</TabsTrigger>
+                <TabsTrigger value="log">Log ({systemLogs.length})</TabsTrigger>
               </TabsList>
 
               {/* DETAILS TAB */}
@@ -549,7 +554,7 @@ export default function StudentDetail() {
 
                 {isLoadingNotes ? (
                   <Skeleton className="h-32 w-full" />
-                ) : notes.length === 0 ? (
+                ) : userNotes.length === 0 ? (
                   <Card>
                     <CardContent className="pt-6">
                       <div className="text-center text-muted-foreground py-8">
@@ -560,7 +565,7 @@ export default function StudentDetail() {
                   </Card>
                 ) : (
                   <div className="space-y-3">
-                    {notes.map((note) => (
+                    {userNotes.map((note) => (
                       <Card key={note.id}>
                         <CardContent className="pt-4">
                           <div className="space-y-2">
@@ -577,7 +582,7 @@ export default function StudentDetail() {
                                   )}
                                 </div>
                               </div>
-                              {user?.id === note.createdBy && !note.isSystemGenerated && (
+                              {user?.id === note.createdBy && (
                                 <div className="flex gap-2">
                                   <Dialog
                                     open={!!editingNote && editingNote.id === note.id}
@@ -661,13 +666,54 @@ export default function StudentDetail() {
                                   </AlertDialog>
                                 </div>
                               )}
-                              {note.isSystemGenerated && (
-                                <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded">
-                                  System Log
-                                </span>
-                              )}
                             </div>
                             <p className="text-sm whitespace-pre-wrap">{note.content}</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+
+              {/* LOG TAB */}
+              <TabsContent value="log" className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold">System Logs</h3>
+                </div>
+
+                {isLoadingNotes ? (
+                  <Skeleton className="h-32 w-full" />
+                ) : systemLogs.length === 0 ? (
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-center text-muted-foreground py-8">
+                        <p>No system logs yet for this student.</p>
+                        <p className="text-sm mt-2">Status changes and system events will appear here.</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="space-y-3">
+                    {systemLogs.map((log) => (
+                      <Card key={log.id}>
+                        <CardContent className="pt-4">
+                          <div className="space-y-2">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1">
+                                <p className="text-sm font-medium">{log.createdByName}</p>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <Clock className="w-3 h-3" />
+                                  <span>
+                                    {new Date(log.createdAt).toLocaleString()}
+                                  </span>
+                                </div>
+                              </div>
+                              <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded">
+                                System Log
+                              </span>
+                            </div>
+                            <p className="text-sm whitespace-pre-wrap">{log.content}</p>
                           </div>
                         </CardContent>
                       </Card>

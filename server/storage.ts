@@ -8,10 +8,13 @@ import {
   type InsertStudent,
   type LoginHistory,
   type InsertLoginHistory,
+  type StudentNote,
+  type InsertStudentNote,
   users,
   birthdays,
   students,
-  loginHistory
+  loginHistory,
+  studentNotes
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, like, ilike, and, gte, lte, desc, sql } from "drizzle-orm";
@@ -37,6 +40,7 @@ export interface IStorage {
   getAllUsers(): Promise<Omit<User, "password">[]>;
   updateUser(id: string, user: UpdateUser): Promise<User | undefined>;
   deleteUser(id: string): Promise<boolean>;
+  getNonAdminUsersWithEmail(): Promise<Omit<User, "password">[]>;
 
   recordLoginAttempt(attempt: InsertLoginHistory): Promise<LoginHistory>;
   getUserLoginHistory(userId: string, limit?: number): Promise<LoginHistory[]>;
@@ -53,6 +57,13 @@ export interface IStorage {
   createStudent(student: InsertStudent): Promise<Student>;
   updateStudent(id: string, student: Partial<InsertStudent>): Promise<Student | undefined>;
   deleteStudent(id: string): Promise<boolean>;
+
+  // Student notes operations
+  getStudentNotes(studentId: string): Promise<StudentNote[]>;
+  getStudentNote(id: string): Promise<StudentNote | undefined>;
+  createStudentNote(note: InsertStudentNote): Promise<StudentNote>;
+  updateStudentNote(id: string, content: string): Promise<StudentNote | undefined>;
+  deleteStudentNote(id: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -94,6 +105,18 @@ export class DatabaseStorage implements IStorage {
   async deleteUser(id: string): Promise<boolean> {
     const result = await db.delete(users).where(eq(users.id, id)).returning();
     return result.length > 0;
+  }
+
+  async getNonAdminUsersWithEmail(): Promise<Omit<User, "password">[]> {
+    const allUsers = await db
+      .select()
+      .from(users)
+      .where(eq(users.role, "user"));
+
+    // Filter users with valid email addresses and remove password
+    return allUsers
+      .filter(user => user.email && user.email.trim() !== '')
+      .map(({ password, ...user }) => user);
   }
 
   async recordLoginAttempt(attempt: InsertLoginHistory): Promise<LoginHistory> {
@@ -219,6 +242,49 @@ export class DatabaseStorage implements IStorage {
 
   async deleteStudent(id: string): Promise<boolean> {
     const result = await db.delete(students).where(eq(students.id, id)).returning();
+    return result.length > 0;
+  }
+
+  // Student notes operations
+  async getStudentNotes(studentId: string): Promise<StudentNote[]> {
+    const notes = await db
+      .select()
+      .from(studentNotes)
+      .where(eq(studentNotes.studentId, studentId))
+      .orderBy(desc(studentNotes.createdAt));
+    return notes;
+  }
+
+  async getStudentNote(id: string): Promise<StudentNote | undefined> {
+    const [note] = await db
+      .select()
+      .from(studentNotes)
+      .where(eq(studentNotes.id, id));
+    return note;
+  }
+
+  async createStudentNote(note: InsertStudentNote): Promise<StudentNote> {
+    const [newNote] = await db
+      .insert(studentNotes)
+      .values(note)
+      .returning();
+    return newNote;
+  }
+
+  async updateStudentNote(id: string, content: string): Promise<StudentNote | undefined> {
+    const [updated] = await db
+      .update(studentNotes)
+      .set({ content, updatedAt: sql`NOW()` })
+      .where(eq(studentNotes.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteStudentNote(id: string): Promise<boolean> {
+    const result = await db
+      .delete(studentNotes)
+      .where(eq(studentNotes.id, id))
+      .returning();
     return result.length > 0;
   }
 }

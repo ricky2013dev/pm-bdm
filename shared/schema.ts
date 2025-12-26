@@ -101,3 +101,31 @@ export const insertStudentSchema = createInsertSchema(students, {
 
 export type InsertStudent = z.infer<typeof insertStudentSchema>;
 export type Student = typeof students.$inferSelect;
+
+// Student Notes Schema
+export const studentNotes = pgTable("student_notes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  studentId: varchar("student_id")
+    .notNull()
+    .references(() => students.id, { onDelete: "cascade" }),
+  content: text("content").notNull(),
+  createdBy: varchar("created_by")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  createdByName: text("created_by_name").notNull(),
+  isSystemGenerated: text("is_system_generated").notNull().default("false"), // "true" or "false" as string for db compatibility
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const insertStudentNoteSchema = createInsertSchema(studentNotes, {
+  content: z.string().min(1, "Note content is required").max(5000, "Note is too long"),
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  isSystemGenerated: true,
+});
+
+export type InsertStudentNote = z.infer<typeof insertStudentNoteSchema>;
+export type StudentNote = typeof studentNotes.$inferSelect;

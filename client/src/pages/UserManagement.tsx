@@ -247,6 +247,7 @@ export default function UserManagement() {
                       <Label htmlFor="username">Username</Label>
                       <Input
                         id="username"
+                        autoComplete="username"
                         value={formData.username}
                         onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                         required
@@ -257,6 +258,7 @@ export default function UserManagement() {
                       <Input
                         id="password"
                         type="password"
+                        autoComplete="new-password"
                         value={formData.password}
                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                         required
@@ -349,7 +351,7 @@ export default function UserManagement() {
                             <History className="w-4 h-4" />
                           </Button>
 
-                          <Dialog>
+                          <Dialog open={!!editingUser && editingUser.id === user.id} onOpenChange={(open) => !open && setEditingUser(null)}>
                             <DialogTrigger asChild>
                               <Button
                                 variant="outline"
@@ -368,6 +370,7 @@ export default function UserManagement() {
                                 <div className="space-y-2">
                                   <Label>Username</Label>
                                   <Input
+                                    autoComplete="username"
                                     value={formData.username}
                                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                                     required
@@ -377,6 +380,7 @@ export default function UserManagement() {
                                   <Label>Password (leave blank to keep current)</Label>
                                   <Input
                                     type="password"
+                                    autoComplete="new-password"
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     placeholder="Enter new password"

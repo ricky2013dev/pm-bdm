@@ -12,10 +12,11 @@ interface HeaderProps {
   onLogout?: () => void;
   onLoginClick?: () => void;
   onInsuranceLoginClick?: () => void;
-  mode?: 'b2b' | 'insurance';
+  onAdminLoginClick?: () => void;
+  mode?: 'b2b' | 'insurance' | 'admin';
 }
 
-const Header: React.FC<HeaderProps> = ({ onLogoClick, currentUser, onLogout, onLoginClick, onInsuranceLoginClick, mode = 'b2b' }) => {
+const Header: React.FC<HeaderProps> = ({ onLogoClick, currentUser, onLogout, onLoginClick, onInsuranceLoginClick, onAdminLoginClick, mode = 'b2b' }) => {
   const [, navigate] = useLocation();
   const { isApiEnabled, toggleApi } = useStediApi();
 
@@ -49,7 +50,7 @@ const Header: React.FC<HeaderProps> = ({ onLogoClick, currentUser, onLogout, onL
                 <span className="text-sm font-medium text-slate-900 dark:text-white">AI Center</span>
               </h1>
               <p className="text-slate-500 dark:text-slate-400 text-[10px] font-medium uppercase tracking-wider mt-0.5">
-                {mode === 'insurance' ? 'Insurance Verification' : 'Insurance Verification'}
+                {mode === 'admin' ? 'User Management' : 'Insurance Verification'}
               </p>
             </div>
           </div>
@@ -57,7 +58,17 @@ const Header: React.FC<HeaderProps> = ({ onLogoClick, currentUser, onLogout, onL
           {/* Navigation Links */}
           {onLogout && (
             <div className="flex items-center gap-2">
-              {mode === 'insurance' ? (
+              {mode === 'admin' ? (
+                <>
+                  <button
+                    onClick={() => navigate('/admin/users')}
+                    className="px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors flex items-center gap-1.5"
+                  >
+                    <span className="material-symbols-outlined text-sm">manage_accounts</span>
+                    User Management
+                  </button>
+                </>
+              ) : mode === 'insurance' ? (
                 <>
                   <button
                     onClick={() => navigate('/insurance/dashboard')}
@@ -178,6 +189,16 @@ const Header: React.FC<HeaderProps> = ({ onLogoClick, currentUser, onLogout, onL
               >
                 <span className="material-symbols-outlined text-sm">phone</span>
                 <span>Insurance Agent</span>
+                <span className="material-symbols-outlined text-sm group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+              </button>
+            )}
+            {onAdminLoginClick && (
+              <button
+                onClick={onAdminLoginClick}
+                className="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white text-xs font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2 group"
+              >
+                <span className="material-symbols-outlined text-sm">admin_panel_settings</span>
+                <span>Admin</span>
                 <span className="material-symbols-outlined text-sm group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
               </button>
             )}

@@ -21,7 +21,8 @@ export async function registerRoutes(
           email: "dental@smithai.com",
           username: "dental_admin",
           password: hashedPassword,
-          role: "dental"
+          role: "dental",
+          dataSource: null
         });
         console.log("Created test dental user: dental@smithai.com");
       }
@@ -33,9 +34,23 @@ export async function registerRoutes(
           email: "insurance@smithai.com",
           username: "insurance_admin",
           password: hashedPassword,
-          role: "insurance"
+          role: "insurance",
+          dataSource: null
         });
         console.log("Created test insurance user: insurance@smithai.com");
+      }
+
+      const adminUser = await storage.getUserByEmail("admin@smithai.com");
+      if (!adminUser) {
+        const hashedPassword = await bcrypt.hash("admin123", 10);
+        await storage.createUser({
+          email: "admin@smithai.com",
+          username: "admin",
+          password: hashedPassword,
+          role: "admin",
+          dataSource: null
+        });
+        console.log("Created test admin user: admin@smithai.com");
       }
     } catch (error) {
       console.error("Error seeding test users:", error);
@@ -109,11 +124,157 @@ export async function registerRoutes(
         user: {
           id: user.id,
           email: user.email,
-          role: user.role
+          role: user.role,
+          username: user.username,
+          dataSource: user.dataSource
         }
       });
     } catch (error) {
       res.status(500).json({ error: "Failed to verify session" });
+    }
+  });
+
+  // Middleware to check if user is admin
+  const requireAdmin = (req: any, res: any, next: any) => {
+    const userRole = req.session?.userRole;
+    if (userRole !== "admin") {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+    next();
+  };
+
+  // User management routes (admin only)
+  app.get("/api/users", requireAdmin, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      // Don't send passwords to the client
+      const safeUsers = users.map(({ password, ...user }) => user);
+      res.json({ success: true, users: safeUsers });
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ error: "Failed to fetch users" });
+    }
+  });
+
+  app.post("/api/users", requireAdmin, async (req, res) => {
+    try {
+      const { email, username, password, role, dataSource } = req.body;
+
+      if (!email || !username || !password || !role) {
+        return res.status(400).json({ error: "Email, username, password, and role are required" });
+      }
+
+      // Check if email already exists
+      const existingEmail = await storage.getUserByEmail(email);
+      if (existingEmail) {
+        return res.status(400).json({ error: "Email already exists" });
+      }
+
+      // Check if username already exists
+      const existingUsername = await storage.getUserByUsername(username);
+      if (existingUsername) {
+        return res.status(400).json({ error: "Username already exists" });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = await storage.createUser({
+        email,
+        username,
+        password: hashedPassword,
+        role,
+        dataSource: dataSource || null
+      });
+
+      const { password: _, ...safeUser } = user;
+      res.json({ success: true, user: safeUser });
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ error: "Failed to create user" });
+    }
+  });
+
+  app.put("/api/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { email, username, role, dataSource } = req.body;
+
+      // Check if trying to update to existing email
+      if (email) {
+        const existingEmail = await storage.getUserByEmail(email);
+        if (existingEmail && existingEmail.id !== id) {
+          return res.status(400).json({ error: "Email already exists" });
+        }
+      }
+
+      // Check if trying to update to existing username
+      if (username) {
+        const existingUsername = await storage.getUserByUsername(username);
+        if (existingUsername && existingUsername.id !== id) {
+          return res.status(400).json({ error: "Username already exists" });
+        }
+      }
+
+      const updates: any = {};
+      if (email) updates.email = email;
+      if (username) updates.username = username;
+      if (role) updates.role = role;
+      if (dataSource !== undefined) updates.dataSource = dataSource;
+
+      const user = await storage.updateUser(id, updates);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const { password: _, ...safeUser } = user;
+      res.json({ success: true, user: safeUser });
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ error: "Failed to update user" });
+    }
+  });
+
+  app.delete("/api/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      // Prevent deleting own account
+      const currentUserId = (req.session as any)?.userId;
+      if (id === currentUserId) {
+        return res.status(400).json({ error: "Cannot delete your own account" });
+      }
+
+      const success = await storage.deleteUser(id);
+      if (!success) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ error: "Failed to delete user" });
+    }
+  });
+
+  app.put("/api/users/:id/password", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { password } = req.body;
+
+      if (!password) {
+        return res.status(400).json({ error: "Password is required" });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = await storage.updateUserPassword(id, hashedPassword);
+
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating password:", error);
+      res.status(500).json({ error: "Failed to update password" });
     }
   });
 

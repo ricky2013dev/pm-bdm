@@ -4,7 +4,7 @@ import { useLocation } from 'wouter';
 interface LoginModalProps {
     isOpen: boolean;
     onClose: () => void;
-    userType?: 'b2b' | 'insurance';
+    userType?: 'b2b' | 'insurance' | 'admin';
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, userType = 'b2b' }) => {
@@ -12,7 +12,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, userType = 'b2
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [hipaaAgreed, setHipaaAgreed] = useState(false);
-    const [email, setEmail] = useState(userType === 'insurance' ? 'insurance@smithai.com' : 'dental@smithai.com');
+    const [email, setEmail] = useState(
+        userType === 'insurance' ? 'insurance@smithai.com' :
+        userType === 'admin' ? 'admin@smithai.com' :
+        'dental@smithai.com'
+    );
     const [password, setPassword] = useState('');
 
     const handleLogin = async (e: React.FormEvent) => {
@@ -48,7 +52,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, userType = 'b2
             }
 
             // Successfully logged in
-            if (userType === 'insurance') {
+            if (userType === 'admin') {
+                navigate('/admin/users');
+            } else if (userType === 'insurance') {
                 navigate('/insurance/dashboard');
             } else {
                 navigate('/b2b-agent/dashboard');
@@ -82,7 +88,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, userType = 'b2
                     </div>
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Welcome To Smith AI Center</h2>
                     <p className="text-slate-500 dark:text-slate-400 mt-2">
-                        {userType === 'insurance' ? 'Insurance Agent Portal' : 'B2B Agent Portal'}
+                        {userType === 'admin' ? 'Admin Portal' :
+                         userType === 'insurance' ? 'Insurance Agent Portal' :
+                         'B2B Agent Portal'}
                     </p>
                 </div>
 

@@ -3,6 +3,7 @@ import { storage } from "../storage";
 import { requireAdmin } from "../auth/middleware";
 import { insertUserSchema, updateUserSchema } from "@shared/schema";
 import { hashPassword } from "../auth/password";
+import { sendPasswordUpdateEmail } from "../email/service";
 
 export function registerUserRoutes(app: Express) {
   // Get user login history (admin only)
@@ -68,9 +69,29 @@ export function registerUserRoutes(app: Express) {
         });
       }
 
+      // Get the original user to access email for notifications
+      const originalUser = await storage.getUser(req.params.id);
+      if (!originalUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
       const user = await storage.updateUser(req.params.id, parsed.data);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
+      }
+
+      // Send email if password was updated
+      if (parsed.data.password && originalUser.email) {
+        try {
+          await sendPasswordUpdateEmail(
+            originalUser.email,
+            originalUser.username,
+            parsed.data.password // Send the plaintext password (before hashing)
+          );
+        } catch (emailError) {
+          console.error("Email notification failed but user was updated:", emailError);
+          // Don't fail the request if email fails
+        }
       }
 
       const { password: _, ...userWithoutPassword } = user;

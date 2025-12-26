@@ -7,6 +7,8 @@ export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  email: text("email"),
+  phone: text("phone"),
   role: text("role", { enum: ["user", "admin"] }).notNull().default("user"),
   createdAt: date("created_at").notNull().default(sql`CURRENT_DATE`),
   updatedAt: date("updated_at").notNull().default(sql`CURRENT_DATE`),
@@ -15,6 +17,8 @@ export const users = pgTable("users", {
 export const insertUserSchema = createInsertSchema(users, {
   username: z.string().min(3, "Username must be at least 3 characters"),
   password: z.string().min(8, "Password must be at least 8 characters"),
+  email: z.string().email("Invalid email format").optional().or(z.literal("")),
+  phone: z.string().optional().or(z.literal("")),
   role: z.enum(["user", "admin"]).optional(),
 }).omit({
   id: true,

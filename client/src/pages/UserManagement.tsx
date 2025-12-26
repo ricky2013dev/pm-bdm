@@ -53,6 +53,8 @@ import { UserPlus, Edit, Trash2, Shield, User, History } from "lucide-react";
 interface UserData {
   id: string;
   username: string;
+  email?: string;
+  phone?: string;
   role: "user" | "admin";
   createdAt: string;
 }
@@ -75,6 +77,8 @@ export default function UserManagement() {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
+    email: "",
+    phone: "",
     role: "user" as "user" | "admin",
   });
 
@@ -176,7 +180,7 @@ export default function UserManagement() {
   });
 
   const resetForm = () => {
-    setFormData({ username: "", password: "", role: "user" });
+    setFormData({ username: "", password: "", email: "", phone: "", role: "user" });
   };
 
   const handleCreate = (e: React.FormEvent) => {
@@ -192,13 +196,25 @@ export default function UserManagement() {
     if (formData.password) {
       updateData.password = formData.password;
     }
+    if (formData.email) {
+      updateData.email = formData.email;
+    }
+    if (formData.phone) {
+      updateData.phone = formData.phone;
+    }
 
     updateMutation.mutate({ id: editingUser.id, data: updateData });
   };
 
   const openEditDialog = (user: UserData) => {
     setEditingUser(user);
-    setFormData({ username: user.username, password: "", role: user.role });
+    setFormData({
+      username: user.username,
+      password: "",
+      email: user.email || "",
+      phone: user.phone || "",
+      role: user.role
+    });
   };
 
   return (
@@ -247,6 +263,26 @@ export default function UserManagement() {
                       />
                     </div>
                     <div className="space-y-2">
+                      <Label htmlFor="email">Email (optional)</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        placeholder="user@example.com"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Phone Number (optional)</Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        placeholder="+1 (555) 000-0000"
+                      />
+                    </div>
+                    <div className="space-y-2">
                       <Label htmlFor="role">Role</Label>
                       <Select
                         value={formData.role}
@@ -278,6 +314,8 @@ export default function UserManagement() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Username</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Phone</TableHead>
                     <TableHead>Role</TableHead>
                     <TableHead>Created At</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -287,6 +325,8 @@ export default function UserManagement() {
                   {users?.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell className="font-medium">{user.username}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{user.email || "-"}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{user.phone || "-"}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           {user.role === "admin" ? (
@@ -340,6 +380,24 @@ export default function UserManagement() {
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     placeholder="Enter new password"
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label>Email (optional)</Label>
+                                  <Input
+                                    type="email"
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                    placeholder="user@example.com"
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label>Phone Number (optional)</Label>
+                                  <Input
+                                    type="tel"
+                                    value={formData.phone}
+                                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                    placeholder="+1 (555) 000-0000"
                                   />
                                 </div>
                                 <div className="space-y-2">
